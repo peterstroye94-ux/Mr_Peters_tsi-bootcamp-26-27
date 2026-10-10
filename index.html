@@ -35,6 +35,7 @@
   --ok: #55CB8E; --ok-soft: rgba(85, 203, 142, .14); --bad: #FF8A82; --bad-soft: rgba(255, 138, 130, .14);
   --shadow: rgba(0, 0, 0, .45); color-scheme: dark; }
 
+[hidden] { display: none !important; }
 html { font-size: 100%; }
 html.big { font-size: 125%; }
 body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.55; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
@@ -123,7 +124,10 @@ p { margin: 0 0 .75rem; }
 .teacher { border: 1px dashed var(--grid-strong); border-radius: 12px; padding: .9rem 1.1rem; }
 .teacher summary { cursor: pointer; font-weight: 700; }
 .teacher ul { margin: .75rem 0 0; padding-left: 1.2rem; display: grid; gap: .45rem; color: var(--ink-soft); }
-.reset { text-align: center; margin-block: 1rem 3rem; }
+.reset { text-align: center; margin-block: 1rem 3rem; display: grid; justify-items: center; gap: .5rem; }
+.reset p { margin: 0; }
+.reset-row { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: center; }
+.erased { color: var(--ok); font-weight: 700; }
 
 /* module pages */
 .mod-head { padding-block: 1.75rem .5rem; }
@@ -1601,7 +1605,9 @@ function home() {
       <li>Use the <b>A+</b> button in the top bar to make everything larger on the projector.</li>
     </ul>
   </details>
-  <p class="reset"><button class="linkbtn" data-act="reset">${S.arm ? 'Tap again to erase all progress on this device' : 'Start over and erase my progress'}</button></p>`;
+  <div class="reset" id="reset">${S.arm
+    ? `<p><b>Erase all progress on this device?</b> Your checked-off skills and streaks will be cleared.</p><div class="reset-row"><button class="btn primary sm" data-act="reset-yes">Yes, erase my progress</button><button class="btn ghost sm" data-act="reset-no">Cancel</button></div>`
+    : `${S.erased ? '<p class="erased" role="status">✓ Progress erased. You’re starting fresh.</p>' : ''}<button class="linkbtn" data-act="reset">Start over and erase my progress</button>`}</div>`;
   return h;
 }
 
@@ -1794,7 +1800,7 @@ function next() {
   newProblem(c.P, c.n); refreshCard();
   const card = document.getElementById('card'); if (card && card.getBoundingClientRect().top < 0) card.scrollIntoView({ block: 'start' });
 }
-function go(v) { S.view = v; S.arm = false; render(true); }
+function go(v) { S.view = v; S.arm = false; S.erased = false; render(true); }
 
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
@@ -1816,7 +1822,9 @@ document.addEventListener('click', e => {
     const btn = document.querySelector(`#ex-${id} .ex-ctrl .btn`); if (btn) btn.focus({ preventScroll: true });
     return;
   }
-  if (a === 'reset') { if (!S.arm) { S.arm = true; render(); return; } saved.st = {}; save(); S.arm = false; S.prac = {}; S.mix = null; render(); return; }
+  if (a === 'reset') { S.arm = true; S.erased = false; render(); document.getElementById('reset').scrollIntoView({ block: 'center' }); return; }
+  if (a === 'reset-no') { S.arm = false; render(); document.getElementById('reset').scrollIntoView({ block: 'center' }); return; }
+  if (a === 'reset-yes') { saved.st = {}; save(); S.arm = false; S.erased = true; S.prac = {}; S.mix = null; S.ex = {}; render(); document.getElementById('reset').scrollIntoView({ block: 'center' }); return; }
   if (a === 'big') { saved.big = !saved.big; save(); applyBig(); }
 });
 document.addEventListener('input', e => {
