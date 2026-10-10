@@ -1,0 +1,1845 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TSI Math Bootcamp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,600..900&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap">
+<style>
+/* Layout: a test-prep notebook. Sticky module bar on top, one reading column on graph paper,
+   bubble-sheet answer choices, highlighter for the one thing that matters (950). */
+:root {
+  --paper: #F3F6F9; --surface: #FFFFFF; --ink: #142039; --ink-soft: #46566F; --muted: #67758C;
+  --line: #D2DCE6; --grid: #E3EAF1; --grid-strong: #CCD8E4;
+  --blue: #2346C9; --on-blue: #FFFFFF; --blue-soft: #E6ECFC; --violet: #8B3DB9;
+  --hi: #FFE14A; --hi-soft: #FFF1A6;
+  --ok: #137A42; --ok-soft: #DDF2E5; --bad: #C1302B; --bad-soft: #FBE4E2;
+  --shadow: rgba(20, 32, 57, .16);
+  --f-display: 'Archivo', 'Arial Narrow', 'Helvetica Neue', Arial, sans-serif;
+  --f-body: 'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #0D1424; --surface: #151F35; --ink: #E7ECF5; --ink-soft: #B6C1D4; --muted: #8E9BB2;
+  --line: #2A3651; --grid: #19243B; --grid-strong: #26334E;
+  --blue: #8EA9FF; --on-blue: #0D1424; --blue-soft: #1C2A4C; --violet: #D2A4FF;
+  --hi: #F0CF45; --hi-soft: rgba(240, 207, 69, .22);
+  --ok: #55CB8E; --ok-soft: rgba(85, 203, 142, .14); --bad: #FF8A82; --bad-soft: rgba(255, 138, 130, .14);
+  --shadow: rgba(0, 0, 0, .45); color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --paper: #0D1424; --surface: #151F35; --ink: #E7ECF5; --ink-soft: #B6C1D4; --muted: #8E9BB2;
+  --line: #2A3651; --grid: #19243B; --grid-strong: #26334E;
+  --blue: #8EA9FF; --on-blue: #0D1424; --blue-soft: #1C2A4C; --violet: #D2A4FF;
+  --hi: #F0CF45; --hi-soft: rgba(240, 207, 69, .22);
+  --ok: #55CB8E; --ok-soft: rgba(85, 203, 142, .14); --bad: #FF8A82; --bad-soft: rgba(255, 138, 130, .14);
+  --shadow: rgba(0, 0, 0, .45); color-scheme: dark; }
+
+html { font-size: 100%; }
+html.big { font-size: 125%; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.55; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+* { box-sizing: border-box; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; border-radius: 6px; }
+.wrap { max-width: 52rem; margin: 0 auto; padding-inline: 1rem; }
+@media (min-width: 720px) { .wrap { padding-inline: 1.5rem; } }
+h1, h2, h3 { text-wrap: balance; }
+p { margin: 0 0 .75rem; }
+.eyebrow { font-family: var(--f-display); font-weight: 700; font-size: .78rem; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin: 0 0 .5rem; }
+.fine { font-size: .92rem; color: var(--ink-soft); }
+.center { text-align: center; }
+
+/* top bar */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); background: color-mix(in srgb, var(--paper) 90%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.top-in { display: flex; align-items: center; gap: .75rem; min-height: 3.4rem; }
+.brand { font-family: var(--f-display); font-weight: 800; font-stretch: 112%; font-size: 1.05rem; background: none; border: 0; padding: .3rem 0; cursor: pointer; white-space: nowrap; }
+.brand span { background: linear-gradient(transparent 55%, var(--hi-soft) 55% 90%, transparent 90%); }
+.tabs { display: flex; gap: .2rem; overflow-x: auto; flex: 1; min-width: 0; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { white-space: nowrap; background: none; border: 0; border-radius: 999px; padding: .45rem .75rem; color: var(--ink-soft); font-weight: 700; font-size: .9rem; cursor: pointer; }
+.tab:hover { background: var(--grid); color: var(--ink); }
+.tab .n { font-family: var(--f-display); font-weight: 800; margin-right: .35rem; color: var(--muted); }
+.tab[aria-current="page"] { background: var(--ink); color: var(--paper); }
+.tab[aria-current="page"] .n { color: var(--hi); }
+.bigbtn { flex: none; border: 1.5px solid var(--line); background: var(--surface); border-radius: 999px; font-family: var(--f-display); font-weight: 800; font-size: .85rem; padding: .35rem .65rem; cursor: pointer; }
+.bigbtn[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+@media (max-width: 640px) { .brand { display: none; } }
+
+/* buttons */
+.btn { display: inline-flex; align-items: center; gap: .55rem; justify-content: center; font-weight: 700; font-size: 1rem; line-height: 1.1; padding: .78rem 1.2rem; min-height: 2.9rem; border-radius: 999px; border: 1.5px solid transparent; cursor: pointer; text-align: center; transition: transform .08s ease, background-color .15s ease; }
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn.primary { background: var(--blue); color: var(--on-blue); }
+.btn.primary:hover:not(:disabled) { filter: brightness(1.08); }
+.btn.ghost { background: transparent; border-color: var(--line); color: var(--ink); }
+.btn.ghost:hover:not(:disabled) { border-color: var(--ink-soft); }
+.btn:disabled { opacity: .45; cursor: default; }
+.btn.sm { min-height: 2.4rem; padding: .55rem .95rem; font-size: .92rem; }
+.btn .cnt { font-weight: 400; opacity: .85; font-size: .82em; font-variant-numeric: tabular-nums; padding-left: .55rem; border-left: 1px solid currentColor; }
+.linkbtn { background: none; border: 0; color: var(--muted); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; font-size: .9rem; padding: .5rem; }
+
+/* math */
+.m { white-space: nowrap; font-variant-numeric: lining-nums; }
+.m i { font-style: italic; padding-right: .05em; }
+.m sup { font-size: .68em; line-height: 0; position: relative; top: -.1em; }
+.fr { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; font-size: .86em; line-height: 1.15; margin: 0 .12em; }
+.fr .nu { border-bottom: .09em solid currentColor; padding: 0 .2em .05em; }
+.fr .de { padding: .05em .2em 0; }
+.tick { color: var(--ok); font-weight: 700; }
+
+/* home */
+.hero { position: relative; margin-block: 1.5rem 2.25rem; padding: clamp(1.25rem, 5vw, 2.75rem); border: 1px solid var(--line); border-radius: 16px; background-color: var(--surface); background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 24px 24px; background-position: -1px -1px; }
+.hero h1 { position: relative; z-index: 0; isolation: isolate; font-family: var(--f-display); font-weight: 900; font-stretch: 115%; font-size: clamp(3rem, 11vw, 6rem); line-height: .92; letter-spacing: -.015em; margin: .2rem 0 1.1rem; }
+.score { position: relative; display: inline-block; padding: 0 .06em; font-variant-numeric: lining-nums; }
+.score::before { content: ""; position: absolute; z-index: -1; left: -.05em; right: -.05em; bottom: .04em; height: .44em; background: var(--hi); border-radius: .06em .14em .08em .12em; transform: rotate(-1.6deg) skewX(-10deg); }
+:root[data-theme="dark"] .score::before { opacity: .9; }
+.lede { font-size: 1.15rem; max-width: 36rem; color: var(--ink-soft); }
+.hero-row { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.5rem; margin-top: 1.25rem; }
+.meter { display: flex; flex-wrap: wrap; align-items: center; gap: .55rem; }
+.meter-t { font-size: .92rem; color: var(--ink-soft); }
+.sq { display: inline-flex; gap: 3px; vertical-align: middle; }
+.sq i { width: .7rem; height: .7rem; border-radius: 2px; border: 1.5px solid var(--grid-strong); background: var(--surface); }
+.sq i.on { background: var(--ok); border-color: var(--ok); }
+.block { margin-block: 2.25rem; }
+.block h2 { font-family: var(--f-display); font-weight: 800; font-stretch: 108%; font-size: 1.45rem; margin: 0 0 .9rem; }
+.facts { list-style: none; margin: 0 0 .75rem; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr)); border: 1px solid var(--line); border-radius: 14px; background: var(--surface); overflow: hidden; }
+.facts li { padding: 1rem 1.1rem; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); margin: 0 -1px -1px 0; }
+.facts b { display: block; font-family: var(--f-display); font-weight: 800; font-stretch: 110%; font-size: 1.35rem; line-height: 1.1; margin-bottom: .3rem; }
+.facts span { font-size: .95rem; color: var(--ink-soft); }
+.agenda { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.agenda li { display: grid; grid-template-columns: 3.4rem minmax(0, 1fr) auto; gap: .9rem; align-items: center; padding: .85rem 0; border-bottom: 1px solid var(--line); }
+.agenda .at { font-family: var(--f-display); font-weight: 800; font-variant-numeric: tabular-nums; color: var(--muted); }
+.ag-main { min-width: 0; display: grid; gap: .1rem; }
+.ag-title { justify-self: start; background: none; border: 0; padding: 0; text-align: left; font-weight: 700; font-size: 1.08rem; cursor: pointer; text-decoration: underline; text-decoration-color: var(--grid-strong); text-underline-offset: 4px; }
+.ag-title:hover { text-decoration-color: var(--blue); }
+.ag-title.plain { text-decoration: none; cursor: default; }
+.ag-n { font-family: var(--f-display); font-weight: 800; margin-right: .45rem; color: var(--blue); }
+.ag-note { font-size: .92rem; color: var(--ink-soft); }
+.agenda li.brk .ag-title, .agenda li.end .ag-title { color: var(--muted); }
+.habits { display: grid; gap: .9rem; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); }
+.habit { display: flex; gap: .85rem; padding: 1rem 1.1rem; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); }
+.habit h3 { margin: 0 0 .25rem; font-size: 1.05rem; }
+.habit p { margin: 0; color: var(--ink-soft); font-size: .97rem; }
+.hn { flex: none; font-family: var(--f-display); font-weight: 900; font-size: 1.6rem; line-height: 1; color: var(--blue); width: 1.4rem; }
+.teacher { border: 1px dashed var(--grid-strong); border-radius: 12px; padding: .9rem 1.1rem; }
+.teacher summary { cursor: pointer; font-weight: 700; }
+.teacher ul { margin: .75rem 0 0; padding-left: 1.2rem; display: grid; gap: .45rem; color: var(--ink-soft); }
+.reset { text-align: center; margin-block: 1rem 3rem; }
+
+/* module pages */
+.mod-head { padding-block: 1.75rem .5rem; }
+.mod-head h1 { font-family: var(--f-display); font-weight: 900; font-stretch: 112%; font-size: clamp(2rem, 7vw, 3.2rem); line-height: 1; margin: 0 0 .8rem; letter-spacing: -.01em; }
+.why { font-size: 1.1rem; color: var(--ink-soft); max-width: 40rem; }
+.seg { display: inline-flex; gap: 4px; padding: 4px; border-radius: 999px; background: var(--surface); border: 1.5px solid var(--line); margin-top: .5rem; }
+.seg button { display: inline-flex; align-items: center; gap: .55rem; border: 0; background: none; border-radius: 999px; padding: .55rem 1.1rem; font-weight: 700; cursor: pointer; color: var(--ink-soft); }
+.seg button[aria-selected="true"] { background: var(--ink); color: var(--paper); }
+.seg button[aria-selected="true"] .sq i:not(.on) { background: transparent; border-color: color-mix(in srgb, var(--paper) 45%, transparent); }
+.mod-body { padding-block: 1rem 3rem; }
+.move { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0 1rem; padding-block: 1.75rem; border-top: 1px solid var(--line); }
+.move:first-child { border-top: 0; }
+.move-n { width: 2.3rem; height: 2.3rem; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: var(--paper); font-family: var(--f-display); font-weight: 800; font-size: 1.1rem; }
+.move-body { min-width: 0; }
+.move h2 { font-family: var(--f-display); font-weight: 800; font-stretch: 106%; font-size: 1.5rem; line-height: 1.15; margin: .2rem 0 .5rem; }
+.rule { font-size: 1.08rem; max-width: 40rem; }
+@media (max-width: 520px) { .move { grid-template-columns: minmax(0, 1fr); } .move-n { margin-bottom: .5rem; width: 2rem; height: 2rem; font-size: 1rem; } }
+.ex { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.1rem; margin-block: .9rem; }
+.ex-q { font-size: 1.1rem; font-weight: 700; margin-bottom: .25rem; }
+.tag { display: inline-block; font-family: var(--f-display); font-weight: 800; font-size: .7rem; letter-spacing: .09em; text-transform: uppercase; color: var(--blue); background: var(--blue-soft); border-radius: 4px; padding: .15rem .4rem; vertical-align: .15em; margin: 0 .35rem .25rem 0; }
+.steps { list-style: none; counter-reset: st; margin: .6rem 0 0; padding: 0; display: grid; gap: .55rem; }
+.steps li { counter-increment: st; display: grid; grid-template-columns: 1.6rem minmax(0, 1fr); column-gap: .6rem; }
+.steps li::before { content: counter(st); grid-row: span 2; width: 1.6rem; height: 1.6rem; border-radius: 50%; border: 1.5px solid var(--grid-strong); display: grid; place-items: center; font-family: var(--f-display); font-weight: 800; font-size: .8rem; color: var(--muted); }
+.say { grid-column: 2; }
+.sm { grid-column: 2; display: block; font-size: 1.22rem; margin-top: .15rem; overflow-x: auto; padding-bottom: .1rem; }
+.steps span.sm > .m { white-space: normal; }
+.ex-ctrl { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .9rem; }
+.watch { margin-top: 1rem; max-width: 40rem; }
+.pen { font-family: var(--f-display); font-weight: 800; font-size: .74rem; letter-spacing: .09em; text-transform: uppercase; color: var(--bad); margin-right: .35rem; border-bottom: 2px solid var(--bad); }
+.tblwrap { overflow-x: auto; margin-block: .75rem 1rem; }
+.words { border-collapse: collapse; min-width: 18rem; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.words th, .words td { padding: .5rem .85rem; border-bottom: 1px solid var(--line); text-align: left; }
+.words th { font-size: .8rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); background: var(--paper); }
+.words tr:last-child td { border-bottom: 0; }
+.words .sym { font-size: 1.35rem; font-weight: 700; text-align: center; color: var(--blue); }
+.xy { border-collapse: collapse; margin-inline: auto; font-size: 1.15rem; font-variant-numeric: tabular-nums; background: var(--surface); }
+.xy th, .xy td { border: 1px solid var(--grid-strong); padding: .45rem .95rem; text-align: center; }
+.xy th { background: var(--paper); }
+.figrow { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1.25rem; margin-block: .5rem; }
+.figrow .plot { margin: 0; max-width: 16rem; }
+.figcap { flex: 1; min-width: 12rem; margin: 0; line-height: 1.9; }
+.key { display: inline-block; width: 1.4rem; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: .5rem; background: var(--blue); }
+.key.k2 { background: var(--violet); }
+.shift { display: grid; grid-template-columns: minmax(0, 17rem) minmax(0, 1fr); gap: 1rem 1.5rem; align-items: center; margin-block: .75rem 1rem; padding: 1rem; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.shift .plot { margin: 0; }
+.shift-ctl { display: grid; gap: .35rem; min-width: 0; }
+.shift-eq { font-size: 1.55rem; margin-bottom: .4rem; }
+.shift-ctl input[type="range"] { width: 100%; accent-color: var(--blue); margin-bottom: .5rem; }
+@media (max-width: 600px) { .shift { grid-template-columns: minmax(0, 1fr); } .shift .plot { max-width: 17rem; margin-inline: auto; } }
+.tip { margin-top: 1.5rem; padding: 1.1rem 1.25rem; border-radius: 12px; background: var(--hi-soft); }
+.tip-h { font-family: var(--f-display); font-weight: 800; font-size: .78rem; letter-spacing: .09em; text-transform: uppercase; margin-bottom: .3rem; }
+.tip p:last-child { margin: 0; }
+.next-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .75rem; margin-top: 1.5rem; }
+.next-row.start { justify-content: flex-start; }
+
+/* practice */
+.chips { display: flex; flex-wrap: wrap; gap: .5rem; margin: .75rem 0 .5rem; }
+.chip { display: inline-flex; align-items: center; gap: .55rem; padding: .5rem .85rem; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface); font-weight: 700; font-size: .92rem; cursor: pointer; }
+.chip:hover { border-color: var(--ink-soft); }
+.chip[aria-pressed="true"] { border-color: var(--ink); background: var(--blue-soft); }
+.dots { display: inline-flex; gap: 3px; }
+.dots i { width: .5rem; height: .5rem; border-radius: 50%; border: 1.5px solid var(--grid-strong); }
+.dots i.on { background: var(--ink); border-color: var(--ink); }
+.dots.done { color: var(--ok); font-weight: 800; }
+.streak { margin: .5rem 0 1rem; color: var(--ink-soft); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: clamp(1rem, 4vw, 1.75rem); box-shadow: 0 14px 34px -22px var(--shadow); }
+.q { font-size: 1.2rem; line-height: 1.5; margin-bottom: 1rem; }
+.quote { font-size: 1.15rem; line-height: 1.5; padding: .8rem 1rem; margin: 0 0 .8rem; background: var(--paper); border-radius: 10px; }
+.quote::before { content: "“"; font-family: var(--f-display); font-weight: 900; color: var(--blue); margin-right: .15rem; }
+.quote::after { content: "”"; font-family: var(--f-display); font-weight: 900; color: var(--blue); margin-left: .1rem; }
+.big { display: grid; gap: .4rem; justify-items: center; font-size: clamp(1.35rem, 5vw, 1.8rem); padding: 1rem; margin: 0 0 1.1rem; border-radius: 12px; background-color: var(--paper); background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 18px 18px; overflow-x: auto; }
+.plot { display: block; width: 100%; max-width: 20rem; height: auto; margin: 0 auto 1.1rem; }
+.plot .bg { fill: var(--surface); }
+.plot .gl { stroke: var(--grid-strong); stroke-width: 1; }
+.plot .gl.ax { stroke: var(--ink-soft); stroke-width: 1.7; }
+.plot .tk { fill: var(--muted); font: 700 11px var(--f-body); paint-order: stroke; stroke: var(--surface); stroke-width: 3px; }
+.plot .axl { fill: var(--ink-soft); font: italic 700 14px var(--f-body); paint-order: stroke; stroke: var(--surface); stroke-width: 3px; }
+.plot .cv { fill: none; stroke: var(--blue); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.plot .cv.alt { stroke: var(--violet); }
+.plot .cv.parent { stroke: var(--muted); stroke-dasharray: 5 6; stroke-width: 2; }
+.plot .pt { fill: var(--ink); stroke: var(--surface); stroke-width: 2; }
+.plot .ptl { fill: var(--ink); font: 700 13px var(--f-body); paint-order: stroke; stroke: var(--surface); stroke-width: 4px; }
+.choices { display: grid; gap: .6rem; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 620px) { .choices { grid-template-columns: repeat(2, minmax(0, 1fr)); } .choices.one { grid-template-columns: minmax(0, 1fr); } }
+.choice { display: flex; align-items: center; gap: .8rem; width: 100%; min-height: 3.4rem; text-align: left; padding: .65rem .9rem; border: 1.5px solid var(--line); border-radius: 12px; background: var(--surface); font-size: 1.15rem; cursor: pointer; transition: border-color .12s ease, background-color .12s ease; }
+.choice:hover:not(:disabled) { border-color: var(--ink-soft); }
+.choice .bub { flex: none; width: 2rem; height: 2rem; border-radius: 50%; border: 1.5px solid var(--ink-soft); display: grid; place-items: center; font-family: var(--f-display); font-weight: 800; font-size: .88rem; transition: background-color .12s ease; }
+.choice .ct { min-width: 0; overflow-x: auto; padding-block: .1rem; }
+.choice[aria-pressed="true"] { border-color: var(--ink); }
+.choice[aria-pressed="true"] .bub { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+.choice:disabled { cursor: default; }
+.choice.right { border-color: var(--ok); background: var(--ok-soft); }
+.choice.right .bub { background: var(--ok); border-color: var(--ok); color: var(--surface); }
+.choice.wrong { border-color: var(--bad); background: var(--bad-soft); }
+.choice.wrong .bub { background: var(--bad); border-color: var(--bad); color: var(--surface); }
+.choice.dim { opacity: .55; }
+.actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .6rem; margin-top: 1.1rem; }
+.hintbox { margin: 1rem 0 0; padding: .75rem 1rem; border-radius: 10px; background: var(--blue-soft); }
+.fb { margin-top: 1.1rem; padding: .9rem 1.1rem; border-radius: 12px; }
+.fb p:last-child { margin-bottom: 0; }
+.fb.yes { background: var(--ok-soft); }
+.fb.no { background: var(--bad-soft); }
+.fb-h { font-weight: 700; font-size: 1.08rem; }
+.fb.yes .fb-h { color: var(--ok); }
+.fb.no .fb-h { color: var(--bad); }
+.sol { margin-top: 1.1rem; padding-top: 1rem; border-top: 1px dashed var(--grid-strong); }
+.results { list-style: none; margin: .5rem 0 1rem; padding: 0; border-top: 1px solid var(--line); }
+.results li { display: grid; grid-template-columns: 2rem minmax(0, 1fr) auto; gap: .5rem; align-items: center; padding: .6rem 0; border-bottom: 1px solid var(--line); }
+.results .rn { font-family: var(--f-display); font-weight: 800; color: var(--muted); font-variant-numeric: tabular-nums; }
+.results .rk { font-weight: 800; }
+.results li.ok .rk { color: var(--ok); }
+.results li.no .rk { color: var(--bad); }
+
+/* written-out work */
+.wk { overflow-x: auto; padding-block: .1rem .2rem; }
+.work { display: inline-grid; align-items: baseline; column-gap: .32em; row-gap: .2em; font-size: 1.22rem; margin-top: .3rem; white-space: nowrap; }
+.work .c { text-align: right; }
+.work .eqs { text-align: center; padding-inline: .3em; }
+.work .opr { color: var(--blue); font-weight: 700; }
+.work .opr:not(:empty) { background: var(--blue-soft); border-radius: 6px; padding-inline: .25em; }
+.work .divr .de { color: var(--blue); font-weight: 700; }
+.work .rule { grid-column: 1 / -1; border-top: 2px solid var(--ink-soft); margin: .05em 0 .1em; }
+.work .stk { color: var(--blue); font-weight: 800; text-align: center; padding-right: .2em; }
+.work .res { font-weight: 700; }
+.wdist .d-row { padding-top: 1.4em; }
+.dist { position: relative; display: inline-block; }
+.d-a, .d-t { color: var(--blue); font-weight: 700; }
+.arcs { position: absolute; left: 0; overflow: visible; pointer-events: none; }
+.arcs .arc { fill: none; stroke: var(--blue); stroke-width: 1.7; stroke-linecap: round; }
+.arcs .ah { fill: var(--blue); }
+.dcap { grid-column: 1 / -1; font-size: .78em; color: var(--blue); padding-block: .1em .25em; }
+.dsep { display: inline-block; width: 1.4em; }
+
+/* butterfly method + percent setup */
+.work.bfw { display: grid; justify-items: start; row-gap: .45rem; }
+.bf-row { display: flex; align-items: center; gap: .7rem; }
+.bf { position: relative; display: inline-flex; align-items: center; font-size: 1.15em; padding: .15em .1em; }
+.bf .fr { font-size: 1em; margin: 0; }
+.bf .fr .nu, .bf .fr .de { padding-inline: .5em; }
+.bf .fr .nu { padding-bottom: .4em; }
+.bf .fr .de { padding-top: .4em; }
+.bf-eq { position: relative; z-index: 1; margin-inline: 1.5em; line-height: 1; }
+.bf-a, .bf-b, .bf-c, .bf-d { position: relative; z-index: 1; }
+.wings { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; z-index: 0; }
+.wings line { stroke-width: 2.2; stroke-linecap: round; opacity: .85; }
+.wings .w1 { stroke: var(--blue); }
+.wings .w2 { stroke: var(--violet); }
+.bf-prod { font-size: 1.05em; }
+.bf-prod .eqs { padding-inline: .45em; }
+.bf-prod .wing1 { color: var(--blue); font-weight: 700; }
+.bf-prod .wing2 { color: var(--violet); font-weight: 700; }
+.bf-lab { display: grid; row-gap: 2.1em; font-family: var(--f-display); font-weight: 700; font-size: .62rem; letter-spacing: .07em; text-transform: uppercase; line-height: 1; white-space: nowrap; color: var(--blue); }
+.bf-lab.l { text-align: right; }
+.bf-lab.r { text-align: left; color: var(--muted); }
+@media (max-width: 480px) { .bf-lab.r { display: none; } }
+.pct-tpl { display: flex; align-items: center; gap: .8rem; width: max-content; max-width: 100%; margin-block: .5rem 1rem; padding: .9rem 1.25rem; border-radius: 12px; background: var(--hi-soft); }
+.tpl-fr { font-family: var(--f-display); font-weight: 800; font-size: 1.6rem; margin: 0; }
+.tpl-fr .nu, .tpl-fr .de { padding-inline: .45em; }
+.tpl-eq { font-size: 1.5rem; font-weight: 700; }
+.pct-tpl .bf-lab { font-size: .7rem; row-gap: 1.7em; }
+
+/* 10% method ladders */
+.work.ladder { display: inline-grid; grid-template-columns: auto auto auto minmax(0, 1fr); column-gap: .55em; row-gap: .3em; align-items: baseline; }
+.ld-p { font-family: var(--f-display); font-weight: 800; text-align: right; color: var(--blue); font-variant-numeric: tabular-nums; }
+.ld-ar { color: var(--muted); }
+.ld-v { text-align: right; font-variant-numeric: tabular-nums; }
+.ld-note { font-family: var(--f-body); font-size: .68em; color: var(--muted); white-space: normal; min-width: 7em; }
+.ld-p.res, .ld-v.res, .ld-build .res { font-weight: 800; color: var(--ink); }
+.ld-build { grid-column: 1 / -1; margin-top: .25em; padding-top: .4em; border-top: 2px solid var(--ink-soft); line-height: 1.6; white-space: normal; }
+.pieces { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .45rem; margin-block: .5rem 1rem; max-width: 36rem; }
+.pc { display: grid; gap: .1rem; padding: .55rem .75rem; border-radius: 10px; background: var(--hi-soft); }
+.pc b { font-family: var(--f-display); font-weight: 900; font-size: 1.3rem; line-height: 1; }
+.pc span { font-size: .85rem; color: var(--ink-soft); line-height: 1.25; }
+@media (prefers-reduced-motion: reduce) { *, *::before { transition: none !important; } }
+</style>
+</head>
+<body>
+
+
+<header class="top">
+  <div class="wrap top-in">
+    <button class="brand" data-act="go" data-go="home">TSI Math <span>Bootcamp</span></button>
+    <nav class="tabs" aria-label="Sections">
+      <button class="tab" data-act="go" data-go="home" data-nav="home">Home</button>
+      <button class="tab" data-act="go" data-go="1" data-nav="1"><span class="n">1</span>Equations</button>
+      <button class="tab" data-act="go" data-go="2" data-nav="2"><span class="n">2</span>Word problems</button>
+      <button class="tab" data-act="go" data-go="3" data-nav="3"><span class="n">3</span>Percents</button>
+      <button class="tab" data-act="go" data-go="4" data-nav="4"><span class="n">4</span>Functions</button>
+      <button class="tab" data-act="go" data-go="mix" data-nav="mix">Mixed review</button>
+    </nav>
+    <button class="bigbtn" id="bigBtn" data-act="big" aria-pressed="false" aria-label="Larger text">A+</button>
+  </div>
+</header>
+<main class="wrap" id="app"></main>
+<script>
+/* TSI Bootcamp problem engine: generators, choice builder, math renderer */
+(function (root) {
+'use strict';
+
+/* ---------- random + number helpers ---------- */
+const rint = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const nz = (a, b) => { let v; do { v = rint(a, b); } while (v === 0); return v; };
+const chance = p => Math.random() < p;
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const gcd = (a, b) => { a = Math.abs(a); b = Math.abs(b); while (b) { [a, b] = [b, a % b]; } return a; };
+const isInt = x => Number.isFinite(x) && Math.abs(x - Math.round(x)) < 1e-9;
+const decs = (x, dp) => isInt(x * Math.pow(10, dp));
+const r2 = x => Math.round(x * 100) / 100;
+function ns(n) { if (isInt(n)) return String(Math.round(n) + 0); return String(+n.toFixed(4)); }
+const N = v => '`' + ns(v) + '`';               // number in prose (renders minus signs)
+function money(n) { n = r2(n); return isInt(n) ? '$' + Math.round(n) : '$' + n.toFixed(2); }
+function moneyAll(vals) { const cents = vals.some(v => !isInt(r2(v))); return v => cents ? '$' + r2(v).toFixed(2) : '$' + Math.round(r2(v)); }
+const pct = n => ns(n) + '%';
+const plural = (n, w, ws) => ns(n) + ' ' + (Math.abs(n) === 1 ? w : (ws || w + 's'));
+const WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+const times = m => m === 2 ? 'twice' : `${WORDS[m]} times`;
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+/* ---------- fractions + linear expressions (plain math strings) ---------- */
+function Fr(n, d = 1) { if (d < 0) { n = -n; d = -d; } const g = gcd(n, d) || 1; return { n: n / g, d: d / g }; }
+const frEq = (a, b) => a.n === b.n && a.d === b.d;
+const frVal = f => f.n / f.d;
+function frAbs(f) { return f.d === 1 ? String(Math.abs(f.n)) : `{${Math.abs(f.n)}/${f.d}}`; }
+function frStr(f) { return (f.n < 0 ? '-' : '') + frAbs(f); }
+function fmtDec(a) { return (a < 1 && decs(a, 2)) ? a.toFixed(2) : ns(a); }
+function coefAbs(c, v) {
+  if (typeof c === 'object') { if (v && Math.abs(c.n) === c.d) return v; return frAbs(c) + v; }
+  const a = Math.abs(c); if (v && a === 1) return v;
+  return (isInt(a) ? ns(a) : fmtDec(a)) + v;
+}
+const isZero = c => typeof c === 'object' ? c.n === 0 : Math.abs(c) < 1e-12;
+const isNeg = c => typeof c === 'object' ? c.n < 0 : c < 0;
+function lin(terms) {
+  let s = '';
+  for (const [c, v] of terms) {
+    if (isZero(c)) continue;
+    const body = coefAbs(c, v);
+    if (s === '') s = (isNeg(c) ? '-' : '') + body; else s += (isNeg(c) ? ' - ' : ' + ') + body;
+  }
+  return s || '0';
+}
+function coefSub(c, x) { const xs = `(${ns(x)})`; if (c === 1) return xs; if (c === -1) return '-' + xs; return `${ns(c)}${xs}`; }
+function linSub(m, b, x) { let s = coefSub(m, x); if (b > 0) s += ` + ${ns(b)}`; else if (b < 0) s += ` - ${ns(-b)}`; return s; }
+const P2 = (a, b) => `(${ns(a)}, ${ns(b)})`;
+const pm = (v) => v < 0 ? `- ${ns(-v)}` : `+ ${ns(v)}`;   // "+ 5" / "- 5" for building expressions
+
+/* ---------- choice builder ---------- */
+const norm = s => String(s).replace(/\s+/g, '').replace(/−/g, '-').toLowerCase();
+const bad = k => /nan|infinity|undefined|null/.test(k);
+function mc(correct, cands, fallback) {
+  const key = o => norm(o.m !== undefined ? o.m : o.t);
+  const seen = new Set([key(correct)]);
+  const out = [Object.assign({}, correct, { ok: true })];
+  for (const c of cands) {
+    if (!c || out.length === 4) continue;
+    const k = key(c); if (!k || seen.has(k) || bad(k)) continue;
+    seen.add(k); out.push(Object.assign({}, c, { ok: false }));
+  }
+  let i = 0;
+  while (out.length < 4 && i < 80) {
+    const c = fallback(i++); if (!c) continue;
+    const k = key(c); if (seen.has(k) || bad(k)) continue;
+    seen.add(k); out.push(Object.assign({}, c, { ok: false }));
+  }
+  return shuffle(out);
+}
+const OFFS = [1, -1, 2, -2, 3, -3, 4, 5, -4, 6, 10, -5];
+function numFb(ans, make) { return i => i < OFFS.length ? make(ans + OFFS[i] * (isInt(ans) || Math.abs(ans) >= 10 ? 1 : 0.5)) : (i < 40 ? make(ans + i) : null); }
+
+
+/* ---------- written-out work: balance steps, distribution, stacking ---------- */
+function F_(c) { if (typeof c === 'object') return Fr(c.n, c.d); if (isInt(c)) return Fr(Math.round(c)); return Fr(Math.round(c * 1e6), 1e6); }
+const fAdd = (a, b) => Fr(a.n * b.d + b.n * a.d, a.d * b.d), fMul = (a, b) => Fr(a.n * b.n, a.d * b.d), fDiv = (a, b) => Fr(a.n * b.d, a.d * b.n);
+function side(terms) { const m = new Map(); for (const [c, v] of terms) { const k = v || ''; m.set(k, m.has(k) ? fAdd(m.get(k), F_(c)) : F_(c)); } return m; }
+function mapOp(m, f) { const o = new Map(); for (const [k, v] of m) o.set(k, f(v)); return o; }
+function mapAdd(a, b) { const o = new Map(a); for (const [k, v] of b) o.set(k, o.has(k) ? fAdd(o.get(k), v) : v); return o; }
+function keysOf(maps, override) {
+  if (override) return override.map(k => k === 'c' ? '' : k);
+  const ks = []; for (const m of maps) for (const k of m.keys()) if (!ks.includes(k)) ks.push(k);
+  return ks.filter(k => k).concat(ks.includes('') ? [''] : []);
+}
+function tBody(f, v, o) {
+  const a = Math.abs(f.n), d = f.d;
+  if (o.dec) { const val = a / d; if (v && val === 1) return v; return (o.money && !v && !isInt(val) ? val.toFixed(2) : ns(val)) + v; }
+  if (v && d > 1 && a === 1 && o.over) return `{${v}/${d}}`;
+  if (v && a === d) return v;
+  return (d === 1 ? String(a) : `{${a}/${d}}`) + v;
+}
+function dStr(d, o) { const v = d.n / d.d; return isInt(v) || o.dec ? ns(v) : `{${Math.abs(d.n)}/${d.d}}`; }
+function cells(m, keys, o, mode, div) {
+  let first = true; const out = [];
+  for (const k of keys) {
+    const f = m.get(k);
+    if (!f || f.n === 0) { out.push(''); continue; }
+    const neg = f.n < 0; let s;
+    if (mode === 'op') s = (neg ? '- ' : '+ ') + tBody(f, k, o);
+    else if (mode === 'div') s = first ? `{${neg ? '-' : ''}${tBody(f, k, o)}/${dStr(div, o)}}` : `${neg ? '- ' : '+ '}{${tBody(f, k, o)}/${dStr(div, o)}}`;
+    else s = (first ? (neg ? '-' : '') : (neg ? '- ' : '+ ')) + tBody(f, k, o);
+    first = false; out.push(s);
+  }
+  if (mode !== 'op' && out.every(x => !x)) { const i = keys.indexOf(''); out[i >= 0 ? i : 0] = '0'; }
+  return out;
+}
+const plainSide = cs => cs.filter(Boolean).join(' ') || '0';
+function balParts(w) {
+  const o = { dec: !!w.dec, over: !!w.over, money: !!w.money }, L = side(w.L), R = side(w.R);
+  let L2, R2, op = null, mode;
+  if (w.div !== undefined) { const d = F_(w.div); L2 = mapOp(L, v => fDiv(v, d)); R2 = mapOp(R, v => fDiv(v, d)); mode = 'div'; }
+  else if (w.mul !== undefined) { const k = F_(w.mul); L2 = mapOp(L, v => fMul(v, k)); R2 = mapOp(R, v => fMul(v, k)); mode = 'mul'; }
+  else { op = side([w.op]); L2 = mapAdd(L, op); R2 = mapAdd(R, op); mode = 'op'; }
+  const kL = keysOf([L, op || new Map(), L2], w.keysL), kR = keysOf([R, op || new Map(), R2], w.keysR);
+  return { o, L, R, L2, R2, op, mode, kL, kR };
+}
+function bfProd(p, q) {
+  if (p === 'x') return q === '1' ? 'x' : `${q}x`;
+  if (q === 'x') return p === '1' ? 'x' : `${p}x`;
+  if (p === '1') return q; if (q === '1') return p;
+  return `${p} * ${q}`;
+}
+function bfParts(w) {
+  const w1 = bfProd(w.a, w.d), w2 = bfProd(w.b, w.c), swap = !/x/.test(w1) && /x/.test(w2);
+  return { first: swap ? w2 : w1, second: swap ? w1 : w2, c1: swap ? 'wing2' : 'wing1', c2: swap ? 'wing1' : 'wing2' };
+}
+const r4 = v => Math.round(v * 1e4) / 1e4;
+function sigDigits(n) { return String(Math.abs(n)).replace('.', '').replace(/^0+/, '').replace(/0+$/, '').length; }
+function placeParts(b) {
+  if (!isInt(b)) { const ip = Math.trunc(b), fp = r4(b - ip); return ip ? [ip, fp] : [b]; }
+  const s = String(Math.round(Math.abs(b))), out = [];
+  for (let i = 0; i < s.length; i++) { const d = +s[i]; if (d) out.push(d * Math.pow(10, s.length - 1 - i)); }
+  return out;
+}
+function mulParts(p, q) {
+  const splitFirst = sigDigits(p) > sigDigits(q), big = splitFirst ? p : q, other = splitFirst ? q : p, parts = placeParts(big);
+  if (parts.length < 2) return null;
+  const term = x => splitFirst ? `${ns(x)} * ${ns(other)}` : `${ns(other)} * ${ns(x)}`;
+  return ['Multiply in parts: split one number by place value, multiply each piece, then add.',
+    `${ns(p)} * ${ns(q)} = ${parts.map(term).join(' + ')} = ${parts.map(x => ns(r4(x * other))).join(' + ')} = ${ns(r4(p * q))}`];
+}
+const cash = v => isInt(r2(v)) ? ns(r2(v)) : r2(v).toFixed(2);
+function pctLadder(p, base, money) {
+  const v = q => r4(base * q / 100), rows = [[100, base, 'the whole']];
+  let terms = null;
+  if (p === 50) rows.push([50, v(50), 'half of 100%']);
+  else if (p === 25) rows.push([50, v(50), 'half of 100%'], [25, v(25), 'half of 50%']);
+  else if (p === 75) { rows.push([50, v(50), 'half of 100%'], [25, v(25), 'half of 50%']); terms = [[1, 50], [1, 25]]; }
+  else if (p === 8.25) { rows.push([1, v(1), 'move the decimal point <b>two</b> places left'], [0.25, v(0.25), 'a quarter of 1% (divide by 4)']); terms = [[8, 1], [1, 0.25]]; }
+  else {
+    rows.push([10, v(10), 'move the decimal point one place left']);
+    const tens = Math.floor(p / 10), five = p % 10 === 5;
+    if (five) rows.push([5, v(5), 'half of 10%']);
+    if (p !== 10 && p !== 5) terms = (tens ? [[tens, 10]] : []).concat(five ? [[1, 5]] : []);
+  }
+  return { t: 'ladder', rows, build: terms ? { target: p, terms } : null, money: !!money };
+}
+function wholeLadder(p, part, money) {
+  const whole = r4(part * 100 / p), v = q => r4(whole * q / 100), rows = [[p, part, 'what you know']];
+  if (p === 50) rows.push([100, whole, '× 2']);
+  else if (p === 25) rows.push([100, whole, '× 4']);
+  else if (p === 75) rows.push([25, v(25), '÷ 3'], [100, whole, '× 4']);
+  else if (p % 10 === 0) { if (p !== 10) rows.push([10, v(10), `÷ ${p / 10}`]); rows.push([100, whole, '× 10']); }
+  else { if (p !== 5) rows.push([5, v(5), `÷ ${p / 5}`]); rows.push([100, whole, '× 20']); }
+  return { t: 'ladder', rows, money: !!money };
+}
+function hundredSteps(top, bottom, P, firstSay) {
+  const g = gcd(top, bottom), st = top / g, sb = bottom / g, k = 100 / sb, out = [[firstSay, `{${top}/${bottom}}`]];
+  if (g > 1) out.push([`Simplify: divide the top and bottom by ${g}.`, `{${top}/${bottom}} = {${st}/${sb}}`]);
+  if (k !== 1) out.push([`Make the bottom 100: multiply the top and bottom by ${k}.`, `{${st}/${sb}} = {${st * k}/100}`]);
+  out.push([`“Out of 100” is a percent. The answer is ${P}%.`, `{${st * k}/100} = ${P}%`]);
+  return out;
+}
+function ladderInfo(w) {
+  const F = v => w.money && !isInt(r2(v)) ? r2(v).toFixed(2) : ns(v), val = q => { const r = w.rows.find(x => x[0] === q); return r ? r[1] : NaN; };
+  let build = null;
+  if (w.build) {
+    const ts = w.build.terms, prods = ts.map(([k, q]) => r4(k * val(q))), ans = r4(prods.reduce((a, b) => a + b, 0));
+    const pctLine = `${ns(w.build.target)}% = ${ts.map(([k, q]) => (k === 1 ? '' : `${k} * `) + `${ns(q)}%`).join(' + ')}`;
+    let valLine = ts.map(([k, q]) => (k === 1 ? '' : `${k} * `) + F(val(q))).join(' + ');
+    if (ts.some(([k]) => k !== 1) && ts.length > 1) valLine += ` = ${prods.map(F).join(' + ')}`;
+    valLine += ` = ${F(ans)}`;
+    build = { pctLine, valLine, ans };
+  }
+  return { rows: w.rows, build, answer: build ? build.ans : w.rows[w.rows.length - 1][1], F };
+}
+function workEqs(w) {
+  if (w.t === 'ladder') return null;
+  if (w.t === 'bf') { if (w.noProd) return null; const B = bfParts(w); return { from: `{${w.a}/${w.b}} = {${w.c}/${w.d}}`, to: `${B.first} = ${B.second}` }; }
+  if (w.t === 'bal') { const B = balParts(w); return { from: `${plainSide(cells(B.L, B.kL, B.o))} = ${plainSide(cells(B.R, B.kR, B.o))}`, to: `${plainSide(cells(B.L2, B.kL, B.o))} = ${plainSide(cells(B.R2, B.kR, B.o))}` }; }
+  if (w.t === 'dist') { const D = distParts(w); return { from: `${D.lhsPlain} = ${D.rPlain}`, to: `${plainSide(cells(D.L2, D.kL, D.o))} = ${D.rPlain}` }; }
+  if (w.t === 'stack') { const S = stackParts(w); return { from: S.rows.slice(0, 2).map(r => `${plainSide(r[0])} = ${plainSide(r[1])}`), to: `${plainSide(S.res[0])} = ${plainSide(S.res[1])}` }; }
+  return null;
+}
+function distParts(w) {
+  const o = { dec: !!w.dec }, a = w.a, inner = w.inner, R = side(w.R);
+  const L2 = side(inner.map(([c, v]) => [F_(c).n / F_(c).d * a, v])), kL = keysOf([L2]), kR = keysOf([R]);
+  const innerPlain = plainSide(cells(side(inner), keysOf([side(inner)]), o));
+  return { o, a, inner, R, L2, kL, kR, lhsPlain: `${ns(a)}(${innerPlain})`, rPlain: plainSide(cells(R, kR, o)) };
+}
+function stackParts(w) {
+  const o = { dec: !!w.dec }, L1 = side(w.e1.L), R1 = side(w.e1.R), L2 = side(w.e2.L), R2 = side(w.e2.R), sg = w.op === '-' ? Fr(-1) : Fr(1);
+  const L3 = mapAdd(L1, mapOp(L2, v => fMul(v, sg))), R3 = mapAdd(R1, mapOp(R2, v => fMul(v, sg)));
+  const kL = keysOf([L1, L2, L3]), kR = keysOf([R1, R2, R3]);
+  return { o, kL, kR, rows: [[cells(L1, kL, o), cells(R1, kR, o)], [cells(L2, kL, o), cells(R2, kR, o)]], res: [cells(L3, kL, o), cells(R3, kR, o)] };
+}
+function cellHTML(t) { if (!t) return ''; const m = /^([+-]) (.*)$/.exec(t); return m ? `${m[1] === '-' ? '−' : '+'} ${mathInner(m[2])}` : mathInner(t); }
+function gridRow(lc, rc, eq, cls) {
+  const c = (t, extra) => `<span class="c${extra ? ' ' + extra : ''}">${cellHTML(t)}</span>`;
+  return lc.map(t => c(t, cls)).join('') + `<span class="eqs">${eq ? '=' : ''}</span>` + rc.map(t => c(t, cls)).join('');
+}
+function renderWork(w) {
+  if (w.t === 'ladder') {
+    const L = ladderInfo(w);
+    let h = '<div class="work ladder m">';
+    w.rows.forEach(([q, v, note], i) => {
+      const fin = !L.build && i === w.rows.length - 1 ? ' res' : '';
+      h += `<span class="ld-p${fin}">${ns(q)}%</span><span class="ld-ar">→</span><span class="ld-v${fin}">${mathInner(L.F(v))}</span><span class="ld-note">${note || ''}</span>`;
+    });
+    if (L.build) h += `<span class="ld-build">${mathInner(L.build.pctLine)}<br><span class="res">${mathInner('= ' + L.build.valLine)}</span></span>`;
+    return h + '</div>';
+  }
+  if (w.t === 'bf') {
+    const B = bfParts(w), sp = (t, c) => `<span class="${c}">${mathInner(t)}</span>`;
+    const frac = (n, d, cn, cd) => `<span class="fr bf-fr"><span class="nu">${sp(n, cn)}</span><span class="de">${sp(d, cd)}</span></span>`;
+    let h = '<div class="work bfw m"><div class="bf-row">';
+    if (w.lab) h += '<span class="bf-lab l"><span>is (part)</span><span>of (whole)</span></span>';
+    h += `<span class="bf">${frac(w.a, w.b, 'bf-a', 'bf-b')}<span class="bf-eq">=</span>${frac(w.c, w.d, 'bf-c', 'bf-d')}</span>`;
+    if (w.lab) h += '<span class="bf-lab r"><span>percent</span><span>out of 100</span></span>';
+    h += '</div>';
+    if (!w.noProd) h += `<div class="bf-prod"><span class="${B.c1}">${mathInner(B.first)}</span><span class="eqs">=</span><span class="${B.c2}">${mathInner(B.second)}</span></div>`;
+    return h + '</div>';
+  }
+  if (w.t === 'bal') {
+    const B = balParts(w), cols = `repeat(${B.kL.length}, auto) auto repeat(${B.kR.length}, auto)`;
+    let h = `<div class="work m" style="grid-template-columns:${cols}">`;
+    if (B.mode === 'div') {
+      h += gridRow(cells(B.L, B.kL, B.o, 'div', F_(w.div)), cells(B.R, B.kR, B.o, 'div', F_(w.div)), true, 'divr');
+    } else {
+      h += gridRow(cells(B.L, B.kL, B.o), cells(B.R, B.kR, B.o), true);
+      if (B.mode === 'op') h += gridRow(cells(B.op, B.kL, B.o, 'op'), cells(B.op, B.kR, B.o, 'op'), false, 'opr');
+      else { const mk = n => Array.from({ length: n }, (_, i) => i === n - 1 ? `* ${ns(w.mul)}` : ''); h += gridRow(mk(B.kL.length), mk(B.kR.length), false, 'opr'); }
+      h += '<span class="rule"></span>';
+    }
+    h += gridRow(cells(B.L2, B.kL, B.o), cells(B.R2, B.kR, B.o), true, 'res');
+    return h + '</div>';
+  }
+  if (w.t === 'dist') {
+    const D = distParts(w);
+    let inner = '', first = true;
+    for (const [c0, v] of D.inner) {
+      const f = F_(c0); if (f.n === 0) continue;
+      const neg = f.n < 0, b = tBody(f, v, D.o);
+      inner += (first ? (neg ? '−' : '') : (neg ? ' − ' : ' + ')) + `<span class="d-t">${mathInner(b)}</span>`; first = false;
+    }
+    const prods = D.inner.filter(([c]) => F_(c).n !== 0).map(([c0, v]) => { const f = F_(c0), t = (f.n < 0 ? '-' : '') + tBody(f, v, D.o), tt = f.n < 0 ? `(${t})` : t; const pf = Fr(f.n * w.a, f.d); return `${ns(w.a)} * ${tt} = ${(pf.n < 0 ? '-' : '') + tBody(pf, v, D.o)}`; });
+    const cols = `auto auto repeat(${D.kR.length}, auto)`;
+    let h = `<div class="work wdist m" style="grid-template-columns:${cols}">`;
+    h += `<span class="c d-row"><span class="dist"><span class="d-a">${mathInner(ns(w.a))}</span>(${inner})</span></span><span class="eqs d-row">=</span>` + cells(D.R, D.kR, D.o).map(t => `<span class="c d-row">${cellHTML(t)}</span>`).join('');
+    h += `<span class="dcap">${prods.map(p => mathInner(p)).join('<span class="dsep"></span>')}</span>`;
+    h += `<span class="c res">${mathInner(plainSide(cells(D.L2, D.kL, D.o)))}</span><span class="eqs">=</span>` + cells(D.R, D.kR, D.o).map(t => `<span class="c">${cellHTML(t)}</span>`).join('');
+    return h + '</div>';
+  }
+  if (w.t === 'stack') {
+    const S = stackParts(w), cols = `auto repeat(${S.kL.length}, auto) auto repeat(${S.kR.length}, auto)`;
+    let h = `<div class="work m" style="grid-template-columns:${cols}">`;
+    h += '<span class="stk"></span>' + gridRow(S.rows[0][0], S.rows[0][1], true);
+    h += `<span class="stk">${w.op === '-' ? '−' : '+'}</span>` + gridRow(S.rows[1][0], S.rows[1][1], true);
+    h += '<span class="rule"></span><span class="stk"></span>' + gridRow(S.res[0], S.res[1], true, 'res');
+    return h + '</div>';
+  }
+  return '';
+}
+
+/* ===================================================================
+   MODULE 1  Linear equations & systems
+   =================================================================== */
+
+function s1a() {
+  let eq, x, cands, steps, hint;
+  if (chance(0.7)) {
+    const a = pick([2, 3, 4, 5, 6, 7, 8, 9, -2, -3, -4, -5]), b = nz(-15, 15);
+    x = nz(-9, 12); const c = a * x + b, ab = Math.abs(b);
+    const sg = b > 0 ? '+' : '−', move = b > 0 ? 'subtract' : 'add';
+    eq = `${lin([[a, 'x'], [b, '']])} = ${c}`;
+    cands = [];
+    if (isInt((c + b) / a)) cands.push({ m: ns((c + b) / a), why: `You ${b > 0 ? 'added' : 'subtracted'} ${ab} instead of ${b > 0 ? 'subtracting' : 'adding'} it. To undo the ${sg} ${ab}, ${move} ${ab} on both sides.` });
+    cands.push({ m: ns(c - b), why: `You got \`${lin([[a, 'x']])} = ${c - b}\` and stopped. Divide both sides by ${N(a)} to get x by itself.` });
+    if (isInt(c / a)) cands.push({ m: ns(c / a - b), why: `You divided by ${N(a)} before moving the ${ab}. Undo the ${sg} ${ab} first, then divide.` });
+    cands.push({ m: ns(-x), why: a < 0 ? `Sign slip. You divide by ${N(a)}, a negative number, so watch the sign of the answer.` : `Sign slip. Plug your answer back in to check the sign.` });
+    steps = [
+      [`Undo the ${sg} ${ab}: ${move} ${ab} on both sides.`, { t: 'bal', L: [[a, 'x'], [b, '']], R: [[c, '']], op: [-b, ''] }],
+      [`Undo the multiplication: divide both sides by ${N(a)}.`, { t: 'bal', L: [[a, 'x']], R: [[c - b, '']], div: a }],
+      [`Check: put ${N(x)} back in.`, `${linSub(a, b, x)} = ${c} ✓`]];
+    hint = `Work backward. Undo the ${sg} ${ab} first, then undo the multiplication by ${N(a)}.`;
+  } else {
+    const a = rint(2, 6), k = nz(-8, 9), b = nz(-12, 12), c = k + b, ab = Math.abs(b);
+    x = a * k; const sg = b > 0 ? '+' : '−', move = b > 0 ? 'subtract' : 'add';
+    eq = `{x/${a}} ${pm(b)} = ${c}`;
+    cands = [{ m: ns(k), why: `You found \`{x/${a}} = ${k}\`. That's x divided by ${a}, so multiply both sides by ${a} to finish.` },
+      { m: ns(a * (c + b)), why: `To undo the ${sg} ${ab}, ${move} ${ab} on both sides.` }];
+    if (isInt((c - b) / a)) cands.push({ m: ns((c - b) / a), why: `x is divided by ${a}. Undo division by multiplying by ${a}, not dividing.` });
+    cands.push({ m: ns(a * c - b), why: `Move the ${ab} first, then multiply by ${a}.` });
+    cands.push({ m: ns(-x), why: 'Sign slip. Plug your answer back in to check it.' });
+    steps = [
+      [`Undo the ${sg} ${ab}: ${move} ${ab} on both sides.`, { t: 'bal', L: [[Fr(1, a), 'x'], [b, '']], R: [[c, '']], op: [-b, ''], over: true }],
+      [`Undo the division: multiply both sides by ${a}.`, { t: 'bal', L: [[Fr(1, a), 'x']], R: [[k, '']], mul: a, over: true }],
+      [`Check: put ${N(x)} back in.`, `{${x}/${a}} ${pm(b)} = ${c} ✓`]];
+    hint = `Undo the ${sg} ${ab} first. Then undo “divided by ${a}” by multiplying by ${a}.`;
+  }
+  const fb = numFb(x, v => ({ m: ns(v), why: `Check it: plug ${N(v)} in for x. The left side doesn't come out to the right side.` }));
+  return { q: 'Solve for `x`.', big: [eq], choices: mc({ m: ns(x) }, cands, fb), hint, steps, spec: { type: 'solve', eq, v: 'x' } };
+}
+
+function s1b() {
+  let eq, x, cands = [], steps, hint;
+  if (chance(0.6)) {
+    const a = pick([2, 3, 4, 5, -2, -3]), p = nz(-6, 6); let c; do { c = pick([-3, -2, -1, 1, 2, 3, 4, 5]); } while (c === a);
+    x = nz(-8, 10); const d = a * (x + p) - c * x, ap = a * p, A = a - c;
+    const inside = lin([[1, 'x'], [p, '']]);
+    eq = `${a}(${inside}) = ${lin([[c, 'x'], [d, '']])}`;
+    { const v = (d - p) / A; if (isInt(v)) cands.push({ m: ns(v), why: `Distribute to <b>both</b> terms: \`${a}(${inside}) = ${lin([[a, 'x'], [ap, '']])}\`. It looks like the ${N(a)} only multiplied the x.` }); }
+    if (a + c !== 0) { const v = (d - ap) / (a + c); if (isInt(v)) cands.push({ m: ns(v), why: `To move \`${lin([[c, 'x']])}\` to the left, ${c > 0 ? 'subtract' : 'add'} it. That leaves \`${lin([[A, 'x']])}\`, not \`${lin([[a + c, 'x']])}\`.` }); }
+    { const v = (d + ap) / A; if (isInt(v)) cands.push({ m: ns(v), why: `When ${N(ap)} moves across the equals sign, it changes sign. ${ap > 0 ? 'Subtract' : 'Add'} ${Math.abs(ap)} on both sides.` }); }
+    cands.push({ m: ns(-x), why: 'Sign slip near the end. Plug your answer into both sides to check.' });
+    steps = [[`Distribute: the ${N(a)} multiplies <b>both</b> terms inside the parentheses.`, { t: 'dist', a, inner: [[1, 'x'], [p, '']], R: [[c, 'x'], [d, '']] }],
+      [`${c > 0 ? 'Subtract' : 'Add'} \`${lin([[Math.abs(c), 'x']])}\` ${c > 0 ? 'from' : 'to'} both sides.`, { t: 'bal', L: [[a, 'x'], [ap, '']], R: [[c, 'x'], [d, '']], op: [-c, 'x'] }],
+      [`${ap > 0 ? 'Subtract' : 'Add'} ${Math.abs(ap)} on both sides.`, { t: 'bal', L: [[A, 'x'], [ap, '']], R: [[d, '']], op: [-ap, ''] }]];
+    if (A !== 1) steps.push([`Divide both sides by ${N(A)}.`, { t: 'bal', L: [[A, 'x']], R: [[d - ap, '']], div: A }]);
+    steps.push([`Check: left side \`${a}(${ns(x)} ${pm(p)}) = ${a * (x + p)}\`, right side \`${linSub(c, d, x)} = ${c * x + d}\`. They match ✓`, null]);
+    hint = `First distribute the ${N(a)} to both terms in the parentheses. Then get all the x-terms on one side.`;
+  } else {
+    const a = pick([2, 3, 4, 5, 6, 7, -2, -3, -4]); let c; do { c = pick([-4, -3, -2, -1, 1, 2, 3, 4, 5, 6]); } while (c === a);
+    const b = nz(-12, 12); x = nz(-8, 10); const d = a * x + b - c * x, A = a - c;
+    eq = `${lin([[a, 'x'], [b, '']])} = ${lin([[c, 'x'], [d, '']])}`;
+    { const v = (d + b) / A; if (isInt(v)) cands.push({ m: ns(v), why: `When ${N(b)} moves across the equals sign, it changes sign. ${b > 0 ? 'Subtract' : 'Add'} ${Math.abs(b)} on both sides.` }); }
+    if (a + c !== 0) { const v = (d - b) / (a + c); if (isInt(v)) cands.push({ m: ns(v), why: `To move \`${lin([[c, 'x']])}\` to the left, ${c > 0 ? 'subtract' : 'add'} it. That leaves \`${lin([[A, 'x']])}\`.` }); }
+    cands.push({ m: ns(-x), why: 'Sign slip near the end. Plug your answer into both sides to check.' });
+    steps = [[`${c > 0 ? 'Subtract' : 'Add'} \`${lin([[Math.abs(c), 'x']])}\` ${c > 0 ? 'from' : 'to'} both sides.`, { t: 'bal', L: [[a, 'x'], [b, '']], R: [[c, 'x'], [d, '']], op: [-c, 'x'] }],
+      [`${b > 0 ? 'Subtract' : 'Add'} ${Math.abs(b)} on both sides.`, { t: 'bal', L: [[A, 'x'], [b, '']], R: [[d, '']], op: [-b, ''] }]];
+    if (A !== 1) steps.push([`Divide both sides by ${N(A)}.`, { t: 'bal', L: [[A, 'x']], R: [[d - b, '']], div: A }]);
+    steps.push([`Check: left side \`${linSub(a, b, x)} = ${a * x + b}\`, right side \`${linSub(c, d, x)} = ${c * x + d}\`. They match ✓`, null]);
+    hint = 'Move all the x-terms to one side and all the plain numbers to the other.';
+  }
+  const fb = numFb(x, v => ({ m: ns(v), why: `Check it: with x = ${N(v)}, the two sides don't match.` }));
+  return { q: 'Solve for `x`.', big: [eq], choices: mc({ m: ns(x) }, cands, fb), hint, steps, spec: { type: 'solve', eq, v: 'x' } };
+}
+
+const FORMULAS = [
+  { eq: 'd = rt', f: 't', vars: ['d', 'r'], ans: 't = {d/r}', what: 'distance (rate × time)',
+    ds: [['t = dr', 'You multiplied by r. Since t is <i>multiplied</i> by r, undo it by dividing.'], ['t = {r/d}', 'Upside down. Divide d by r, so d stays on top.'], ['t = d - r', 'r multiplies t. Undo multiplication with division, not subtraction.']],
+    steps: [['Divide both sides by `r`.', '{d/r} = t']] },
+  { eq: 'A = {1/2}bh', f: 'h', vars: ['A', 'b'], ans: 'h = {2A/b}', what: 'the area of a triangle',
+    ds: [['h = {A/2b}', 'To undo “half of,” multiply by 2. Dividing by 2 again goes the wrong way.'], ['h = 2Ab', '`b` multiplies `h`, so divide by `b`.'], ['h = {b/2A}', 'Upside down. `2A` belongs on top.']],
+    steps: [['Multiply both sides by 2 to clear the fraction.', '2A = bh'], ['Divide both sides by `b`.', '{2A/b} = h']] },
+  { eq: 'P = 2l + 2w', f: 'w', vars: ['P', 'l'], ans: 'w = {P - 2l/2}', what: 'the perimeter of a rectangle',
+    ds: [['w = P - 2l', 'Almost. That still equals `2w`, so divide by 2.'], ['w = {P + 2l/2}', 'To move `+ 2l`, subtract it.'], ['w = {P/2} - 2l', 'When you divide by 2, divide <b>both</b> terms. `2l` divided by 2 is `l`.']],
+    steps: [['Subtract `2l` from both sides.', 'P - 2l = 2w'], ['Divide both sides by 2.', '{P - 2l/2} = w']] },
+  { eq: 'y = mx + b', f: 'x', vars: ['y', 'm', 'b'], ans: 'x = {y - b/m}', what: 'a line in slope-intercept form',
+    ds: [['x = {y + b/m}', 'To move `+ b`, subtract it.'], ['x = {y/m} - b', 'Move the `b` before you divide by `m`.'], ['x = m(y - b)', '`m` multiplies `x`, so divide by `m`.']],
+    steps: [['Subtract `b` from both sides.', 'y - b = mx'], ['Divide both sides by `m`.', '{y - b/m} = x']] },
+  { eq: 'F = {9/5}C + 32', f: 'C', vars: ['F'], ans: 'C = {5/9}(F - 32)', what: 'converting Celsius to Fahrenheit',
+    ds: [['C = {5/9}F - 32', 'Subtract the 32 first, then multiply by `{5/9}`. The parentheses matter.'], ['C = {9/5}(F - 32)', 'To undo multiplying by `{9/5}`, multiply by its flip, `{5/9}`.'], ['C = {5/9}(F + 32)', 'To move `+ 32`, subtract it.']],
+    steps: [['Subtract 32 from both sides.', 'F - 32 = {9/5}C'], ['Multiply both sides by `{5/9}`, the flip of `{9/5}`.', '{5/9}(F - 32) = C']] },
+  { eq: 'I = Prt', f: 'r', vars: ['I', 'P', 't'], ans: 'r = {I/Pt}', what: 'simple interest',
+    ds: [['r = IPt', '`P` and `t` multiply `r`, so divide by them.'], ['r = {Pt/I}', 'Upside down. `I` belongs on top.'], ['r = I - Pt', 'Undo multiplication with division, not subtraction.']],
+    steps: [['Divide both sides by `Pt`.', '{I/Pt} = r']] },
+  { eq: 'V = lwh', f: 'w', vars: ['V', 'l', 'h'], ans: 'w = {V/lh}', what: 'the volume of a box',
+    ds: [['w = Vlh', '`l` and `h` multiply `w`, so divide by them.'], ['w = V - lh', 'Undo multiplication with division, not subtraction.'], ['w = {lh/V}', 'Upside down. `V` belongs on top.']],
+    steps: [['Divide both sides by `lh`.', '{V/lh} = w']] }
+];
+
+function s1c() {
+  if (chance(0.55)) {
+    const a = nz(-6, 6), b = pick([2, 3, 4, 5, -2, -3]);
+    const c = chance(0.7) ? b * nz(-6, 8) : nz(-12, 20);
+    const m = Fr(-a, b), k = Fr(c, b);
+    const eq = `${lin([[a, 'x'], [b, 'y']])} = ${c}`;
+    const ans = `y = ${lin([[m, 'x'], [k, '']])}`;
+    const cands = [
+      { m: `y = ${lin([[Fr(a, b), 'x'], [k, '']])}`, why: `When \`${lin([[a, 'x']])}\` moves to the other side, its sign flips. It becomes \`${lin([[-a, 'x']])}\`.` },
+      { m: `y = ${lin([[m, 'x'], [Fr(c, 1), '']])}`, why: `Divide <b>every</b> term by ${N(b)}, including the ${N(c)}.` },
+      frEq(Fr(-b, a), m) ? null : { m: `y = ${lin([[Fr(-b, a), 'x'], [k, '']])}`, why: `The fraction is upside down. You divide by ${N(b)}, the number with y, so ${N(b)} goes on the bottom.` },
+      { m: `y = ${lin([[Fr(-a, 1), 'x'], [k, '']])}`, why: `Divide <b>every</b> term by ${N(b)}, including the x-term.` }];
+    const fb = i => ({ m: `y = ${lin([[m, 'x'], [Fr(c + (i + 1) * b, b), '']])}`, why: 'Check the constant: divide the number on the right by the y-coefficient.' });
+    const steps = [[`${a > 0 ? 'Subtract' : 'Add'} \`${lin([[Math.abs(a), 'x']])}\` on both sides so only the y-term is left.`, { t: 'bal', L: [[a, 'x'], [b, 'y']], R: [[c, '']], op: [-a, 'x'] }],
+      [`Divide <b>every</b> term by ${N(b)}.`, { t: 'bal', L: [[b, 'y']], R: [[-a, 'x'], [c, '']], div: b }]];
+    return { q: 'Solve the equation for `y`.', big: [eq], choices: mc({ m: ans }, cands, fb), hint: `Get the y-term alone first, then divide every term by ${N(b)}.`, steps,
+      spec: { type: 'literal', eq, f: 'y', vars: ['x'] } };
+  }
+  const F = pick(FORMULAS);
+  const cands = F.ds.map(([m, why]) => ({ m, why }));
+  return { q: `The formula for ${F.what} is \`${F.eq}\`. Solve it for \`${F.f}\`.`, big: [], choices: mc({ m: F.ans }, cands, () => null),
+    hint: `Treat the other letters like numbers. Undo what is being done to \`${F.f}\`, in reverse order.`, steps: F.steps,
+    spec: { type: 'literal', eq: F.eq, f: F.f, vars: F.vars } };
+}
+
+function pairWhy(eqs, px, py) {
+  for (const e of eqs) {
+    if (e.t === 'si') { const yv = e.m * px + e.b; if (yv !== py) return `Check it in \`y = ${lin([[e.m, 'x'], [e.b, '']])}\`: \`x = ${ns(px)}\` gives \`y = ${linSub(e.m, e.b, px)} = ${ns(yv)}\`, not ${N(py)}.`; }
+    else { const lv = e.a * px + e.b * py; if (lv !== e.c) return `Check it in \`${lin([[e.a, 'x'], [e.b, 'y']])} = ${e.c}\`: \`${coefSub(e.a, px)} ${e.b < 0 ? '-' : '+'} ${coefSub(Math.abs(e.b), py)} = ${ns(lv)}\`, not ${N(e.c)}.`; }
+  }
+  return '';
+}
+
+const COUNT_TXT = { one: 'Exactly one solution', none: 'No solution', inf: 'Infinitely many solutions', two: 'Exactly two solutions' };
+function s1d() {
+  const r = Math.random();
+  if (r < 0.4) {
+    const x0 = rint(-5, 6), y0 = rint(-6, 8), m1 = nz(-4, 4); let m2; do { m2 = nz(-4, 4); } while (m2 === m1);
+    const b1 = y0 - m1 * x0, b2 = y0 - m2 * x0, D = m1 - m2;
+    const e1 = `y = ${lin([[m1, 'x'], [b1, '']])}`, e2 = `y = ${lin([[m2, 'x'], [b2, '']])}`;
+    const eqs = [{ t: 'si', m: m1, b: b1 }, { t: 'si', m: m2, b: b2 }];
+    const W = (px, py, lead) => (lead ? lead + ' ' : '') + pairWhy(eqs, px, py);
+    const cands = [
+      x0 !== y0 ? { m: P2(y0, x0), why: W(y0, x0, 'Order matters. An ordered pair is (x, y), so the x-value comes first.') } : null,
+      x0 !== 0 ? { m: P2(-x0, m1 * -x0 + b1), why: W(-x0, m1 * -x0 + b1, 'A sign flipped when you collected the x-terms.') } : null,
+      x0 !== 0 ? { m: P2(x0, b1), why: `${N(b1)} is where the first line crosses the y-axis. After you find x, plug it back in to get y.` } : null,
+      y0 !== 0 ? { m: P2(x0, -y0), why: W(x0, -y0, 'The x-value is right. Recheck the sign of y.') } : null];
+    const fb = i => { const o = [[1, 0], [0, 1], [-1, 0], [0, -1], [1, 1], [2, 0], [0, 2], [-1, -1]][i]; if (!o) return null; const px = x0 + o[0], py = y0 + o[1]; return { m: P2(px, py), why: pairWhy(eqs, px, py) }; };
+    const steps = [['Both equations equal y, so set the right sides equal to each other.', `${lin([[m1, 'x'], [b1, '']])} = ${lin([[m2, 'x'], [b2, '']])}`],
+      [`${m2 > 0 ? 'Subtract' : 'Add'} \`${lin([[Math.abs(m2), 'x']])}\` ${m2 > 0 ? 'from' : 'to'} both sides.`, { t: 'bal', L: [[m1, 'x'], [b1, '']], R: [[m2, 'x'], [b2, '']], op: [-m2, 'x'] }]];
+    if (b1 !== 0) steps.push([`${b1 > 0 ? 'Subtract' : 'Add'} ${Math.abs(b1)} on both sides.`, { t: 'bal', L: [[D, 'x'], [b1, '']], R: [[b2, '']], op: [-b1, ''] }]);
+    if (D !== 1) steps.push([`Divide both sides by ${N(D)}.`, { t: 'bal', L: [[D, 'x']], R: [[b2 - b1, '']], div: D }]);
+    steps.push([`Plug \`x = ${x0}\` into the first equation to find y.`, `y = ${linSub(m1, b1, x0)} = ${y0}`],
+      [`The lines meet at \`${P2(x0, y0)}\`. Check it in the second equation: \`${linSub(m2, b2, x0)} = ${y0}\` ✓`, null]);
+    return { q: 'At what point do these two lines intersect?', big: [e1, e2], choices: mc({ m: P2(x0, y0) }, cands, fb),
+      hint: 'Both equations say “y = …”, so set the two right sides equal and solve for x. Then find y.', steps, spec: { type: 'pair', eqs: [e1, e2] } };
+  }
+  if (r < 0.75) {
+    const x0 = rint(-4, 6), y0 = rint(-4, 6), b1 = rint(1, 4), add = chance(0.5), b2 = add ? -b1 : b1;
+    const a1 = rint(1, 5); let a2; do { a2 = rint(1, 5); } while (!add && a2 === a1);
+    const c1 = a1 * x0 + b1 * y0, c2 = a2 * x0 + b2 * y0, A = add ? a1 + a2 : a1 - a2, C = add ? c1 + c2 : c1 - c2;
+    const e1 = `${lin([[a1, 'x'], [b1, 'y']])} = ${c1}`, e2 = `${lin([[a2, 'x'], [b2, 'y']])} = ${c2}`;
+    const eqs = [{ t: 'std', a: a1, b: b1, c: c1 }, { t: 'std', a: a2, b: b2, c: c2 }];
+    const W = (px, py, lead) => (lead ? lead + ' ' : '') + pairWhy(eqs, px, py);
+    const cands = [
+      x0 !== y0 ? { m: P2(y0, x0), why: W(y0, x0, 'Order matters. An ordered pair is (x, y), so the x-value comes first.') } : null,
+      y0 !== 0 ? { m: P2(x0, -y0), why: W(x0, -y0, 'The x-value is right. Recheck the sign of y.') } : null,
+      x0 !== 0 ? { m: P2(-x0, y0), why: W(-x0, y0, 'Recheck the sign of x.') } : null];
+    const fb = i => { const o = [[1, 0], [0, 1], [-1, 0], [0, -1], [1, 1], [2, 0], [0, 2]][i]; if (!o) return null; const px = x0 + o[0], py = y0 + o[1]; return { m: P2(px, py), why: pairWhy(eqs, px, py) }; };
+    const steps = [[add ? `Stack the equations and <b>add</b> them. The y-terms (\`${lin([[b1, 'y']])}\` and \`${lin([[b2, 'y']])}\`) are opposites, so they cancel.` : `Stack the equations and <b>subtract</b> every term of the second from the first. The y-terms (\`${lin([[b1, 'y']])}\`) match, so they cancel.`, { t: 'stack', e1: { L: [[a1, 'x'], [b1, 'y']], R: [[c1, '']] }, e2: { L: [[a2, 'x'], [b2, 'y']], R: [[c2, '']] }, op: add ? '+' : '-' }]];
+    if (A !== 1) steps.push([`Divide both sides by ${N(A)}.`, { t: 'bal', L: [[A, 'x']], R: [[C, '']], div: A }]);
+    steps.push([`Plug \`x = ${x0}\` into the first equation.`, `${coefSub(a1, x0)} + ${lin([[b1, 'y']])} = ${c1}`]);
+    if (a1 * x0 !== 0) steps.push([`${a1 * x0 > 0 ? 'Subtract' : 'Add'} ${Math.abs(a1 * x0)} on both sides.`, { t: 'bal', L: [[a1 * x0, ''], [b1, 'y']], R: [[c1, '']], op: [-a1 * x0, ''], keysL: ['c', 'y'] }]);
+    if (b1 !== 1) steps.push([`Divide both sides by ${b1}.`, { t: 'bal', L: [[b1, 'y']], R: [[c1 - a1 * x0, '']], div: b1 }]);
+    steps.push([`The solution is the point \`${P2(x0, y0)}\`.`, null]);
+    return { q: 'Solve the system. Which point works in both equations?', big: [e1, e2], choices: mc({ m: P2(x0, y0) }, cands, fb),
+      hint: add ? 'Look at the y-terms. They are opposites, so adding the equations cancels y.' : 'Look at the y-terms. They match, so subtracting one equation from the other cancels y.',
+      steps, spec: { type: 'pair', eqs: [e1, e2] } };
+  }
+  const kind = pick(['one', 'none', 'inf']), m = nz(-4, 4), b = rint(-6, 6);
+  let m2 = m, b2 = b; if (kind === 'none') b2 = b + nz(-5, 5); if (kind === 'one') { do { m2 = nz(-4, 4); } while (m2 === m); b2 = rint(-6, 6); }
+  const k = pick([2, 3, -2]);
+  const e1 = `y = ${lin([[m, 'x'], [b, '']])}`, e2 = `${lin([[-k * m2, 'x'], [k, 'y']])} = ${k * b2}`;
+  const truth = `Solve the second equation for y and you get \`y = ${lin([[m2, 'x'], [b2, '']])}\`. ` +
+    (kind === 'inf' ? 'That is the same line as the first one, so every point on it works.' : kind === 'none' ? 'Same slope, different y-intercept: the lines are parallel and never meet.' : 'The slopes are different, so the lines cross at exactly one point.');
+  const cands = ['one', 'none', 'inf', 'two'].filter(c => c !== kind).map(c => ({ t: COUNT_TXT[c], why: (c === 'two' ? 'Two different straight lines can cross at most once. ' : '') + truth }));
+  const steps = [['Rewrite the second equation in `y = mx + b` form. Move the x-term first.', `${lin([[k, 'y']])} = ${lin([[k * m2, 'x'], [k * b2, '']])}`],
+    [`Divide every term by ${N(k)}.`, `y = ${lin([[m2, 'x'], [b2, '']])}`],
+    [kind === 'inf' ? 'Same slope and same intercept as the first line. It is the same line: infinitely many solutions.' : kind === 'none' ? `Same slope (${N(m)}) but different intercepts (${N(b)} and ${N(b2)}). Parallel lines never cross: no solution.` : `Different slopes (${N(m)} and ${N(m2)}). The lines cross once: exactly one solution.`, null]];
+  return { q: 'How many solutions does this system have?', big: [e1, e2], choices: mc({ t: COUNT_TXT[kind] }, cands, () => null),
+    hint: 'Put both equations in `y = mx + b` form. Compare the slopes, then the intercepts.', steps, spec: { type: 'count', eqs: [e1, e2], answer: kind } };
+}
+
+/* ===================================================================
+   MODULE 2  Word problems -> equations
+   =================================================================== */
+
+function s2a() {
+  const t = rint(1, 5), k = rint(2, 12), m = rint(2, 6);
+  let sent, ans, ds, T, steps, hint;
+  if (t === 1) {
+    const lo = Math.ceil((k + 1) / m), n = rint(lo, lo + 10); T = m * n - k;
+    sent = `${k} less than ${times(m)} a number is ${T}.`; ans = `${m}n - ${k} = ${T}`;
+    ds = [[`${k} - ${m}n = ${T}`, `“Less than” flips the order. “${k} less than ${times(m)} a number” starts with \`${m}n\` and takes away ${k}.`],
+      [`${m}(n - ${k}) = ${T}`, `The ${k} is subtracted <b>after</b> you multiply, so there are no parentheses.`],
+      [`${m}n + ${k} = ${T}`, '“Less than” means subtract, not add.']];
+    hint = `“Less than” flips the order: “${k} less than y” means \`y - ${k}\`.`;
+    steps = [[`“${cap(times(m))} a number” is \`${m}n\`. “${k} less than” that is \`${m}n - ${k}\`. “Is” means =.`, ans], [`Bonus: solve it. Add ${k} to both sides.`, { t: 'bal', L: [[m, 'n'], [-k, '']], R: [[T, '']], op: [k, ''] }], [`Divide both sides by ${m}.`, { t: 'bal', L: [[m, 'n']], R: [[T + k, '']], div: m }]];
+  } else if (t === 2) {
+    const n = rint(1, 12); T = m * n + k;
+    sent = `${k} more than ${times(m)} a number is ${T}.`; ans = `${m}n + ${k} = ${T}`;
+    ds = [[`${m}(n + ${k}) = ${T}`, `The ${k} is added <b>after</b> you multiply, so there are no parentheses.`],
+      [`${m}n - ${k} = ${T}`, '“More than” means add.'],
+      k !== m && (T - m) / k !== n ? [`${k}n + ${m} = ${T}`, `The number is multiplied by ${m}, and then ${k} is added.`] : null,
+      T - m - k !== n ? [`${m} + n + ${k} = ${T}`, `“${cap(times(m))}” means multiply.`] : null,
+      [`${m}n = ${T} + ${k}`, `The ${k} belongs with \`${m}n\` on the left side. The sentence adds it to ${times(m)} the number.`]];
+    hint = `Build it in order: first “${times(m)} a number,” then add ${k}.`;
+    steps = [[`“${cap(times(m))} a number” is \`${m}n\`. “${k} more than” that is \`${m}n + ${k}\`. “Is” means =.`, ans], [`Bonus: solve it. Subtract ${k} from both sides.`, { t: 'bal', L: [[m, 'n'], [k, '']], R: [[T, '']], op: [-k, ''] }], [`Divide both sides by ${m}.`, { t: 'bal', L: [[m, 'n']], R: [[T - k, '']], div: m }]];
+  } else if (t === 3) {
+    const n = rint(1, 10); T = m * (n + k);
+    sent = `${cap(times(m))} the sum of a number and ${k} is ${T}.`; ans = `${m}(n + ${k}) = ${T}`;
+    ds = [[`${m}n + ${k} = ${T}`, `“The sum of a number and ${k}” has to be added first. Parentheses keep the sum together.`],
+      [`${m}(n - ${k}) = ${T}`, '“Sum” means add.'],
+      [`${m} + n + ${k} = ${T}`, `“${cap(times(m))}” means multiply.`]];
+    hint = '“The sum of a number and …” is one group. Put it in parentheses before you multiply.';
+    steps = [[`“The sum of a number and ${k}” is \`n + ${k}\`. ${cap(times(m))} that sum needs parentheses.`, ans], [`Bonus: solve it. Divide by ${m}, then subtract ${k}.`, `n = ${n}`]];
+  } else if (t === 4) {
+    T = rint(2, 9); const n = m * T + k;
+    sent = `The difference of a number and ${k}, divided by ${m}, is ${T}.`; ans = `{n - ${k}/${m}} = ${T}`;
+    ds = [[`n - {${k}/${m}} = ${T}`, `The whole difference gets divided by ${m}, so all of \`n - ${k}\` goes on top of the fraction.`],
+      [`{${k} - n/${m}} = ${T}`, `“The difference of a number and ${k}” is \`n - ${k}\`, in that order.`],
+      [`${m}(n - ${k}) = ${T}`, '“Divided by” means divide, not multiply.']];
+    hint = `“The difference of a number and ${k}” is \`n - ${k}\`. The comma tells you the whole difference is divided.`;
+    steps = [[`“The difference of a number and ${k}” is \`n - ${k}\`. Divide that whole group by ${m}.`, ans], [`Bonus: solve it. Multiply by ${m}, then add ${k}.`, `n = ${n}`]];
+  } else {
+    T = null;
+    sent = `A number decreased by ${k} is equal to ${times(m)} the number.`; ans = `n - ${k} = ${m}n`;
+    ds = [[`${k} - n = ${m}n`, `“A number decreased by ${k}” starts with the number: \`n - ${k}\`.`],
+      [`n - ${k} = ${m} + n`, `“${cap(times(m))} the number” is a product: \`${m}n\`.`],
+      [`n = ${m}n - ${k}`, `The ${k} is taken away from n on the <b>left</b> side.`]];
+    hint = '“Decreased by” means subtract, and the number comes first. “Is equal to” is the equals sign.';
+    steps = [[`Left side: “a number decreased by ${k}” is \`n - ${k}\`. Right side: “${times(m)} the number” is \`${m}n\`.`, ans]];
+  }
+  const cands = ds.filter(Boolean).map(([mm, why]) => ({ m: mm, why }));
+  return { q: 'Let `n` be the number. Which equation matches this sentence?', quote: sent, big: [], choices: mc({ m: ans }, cands, () => null), hint, steps,
+    spec: { type: 'translate', t, k, m, T } };
+}
+
+const MODELS = [
+  { v: 'm', tot: 'C', unit: 'month', mk: () => { const f = pick([25, 30, 40, 50, 75]), r = pick([15, 20, 25, 30, 35]); return { f, r, s: `A gym charges a ${money(f)} sign-up fee plus ${money(r)} per month.`, a: 'Which equation gives the total cost `C`, in dollars, after `m` months?' }; } },
+  { v: 'd', tot: 'C', unit: 'mile', mk: () => { const f = pick([3, 3.5, 4, 5]), r = pick([2, 2.25, 2.5, 3]); return { f, r, s: `A taxi ride costs ${money(f)} to start plus ${money(r)} per mile.`, a: 'Which equation gives the cost `C` of a ride that is `d` miles long?' }; } },
+  { v: 'g', tot: 'C', unit: 'GB', mk: () => { const f = pick([30, 35, 40, 45]), r = pick([5, 8, 10, 12]); return { f, r, s: `A phone plan costs ${money(f)} per month plus ${money(r)} for each gigabyte (GB) of data used.`, a: 'Which equation gives the monthly bill `C` when `g` GB are used?' }; } },
+  { v: 'h', tot: 'C', unit: 'hour', mk: () => { const f = pick([60, 75, 80, 90]), r = pick([45, 50, 65, 70]); return { f, r, s: `A plumber charges a ${money(f)} visit fee plus ${money(r)} per hour of work.`, a: 'Which equation gives the total charge `C` for `h` hours of work?' }; } },
+  { v: 'w', tot: 'S', unit: 'week', mk: () => { const f = pick([50, 80, 120, 150]), r = pick([10, 15, 20, 25]); return { f, r, s: `Jada already has ${money(f)} saved and adds ${money(r)} every week.`, a: 'Which equation gives her total savings `S` after `w` weeks?' }; } },
+  { v: 't', tot: 'C', unit: 'text', mk: () => { const f = pick([15, 20, 25]), r = pick([0.05, 0.1, 0.15, 0.25]); return { f, r, s: `A messaging plan costs ${money(f)} a month plus ${money(r)} per text.`, a: 'Which equation gives the monthly cost `C` for `t` texts?' }; } },
+  { v: 't', tot: 'G', unit: 'minute', neg: true, mk: () => { const f = pick([300, 400, 500, 600]), r = pick([8, 10, 12, 15, 20]); return { f, r, s: `A tank holds ${f} gallons of water and drains at ${r} gallons per minute.`, a: 'Which equation gives the gallons `G` left after `t` minutes?' }; } }
+];
+
+function s2b() {
+  const M = pick(MODELS), { f, r, s, a } = M.mk(), v = M.v, T = M.tot, u = M.unit;
+  let ans, cands, steps, hint;
+  if (!M.neg) {
+    ans = `${T} = ${lin([[r, v], [f, '']])}`;
+    cands = [{ m: `${T} = ${lin([[f, v], [r, '']])}`, why: `The ${money(f)} happens once, so it stands alone. The ${money(r)} happens every ${u}, so it gets multiplied by \`${v}\`.` },
+      { m: `${T} = ${coefAbs(r, '')}(${v} + ${ns(f)})`, why: `The parentheses multiply the one-time ${money(f)} by \`${v}\` too. It should only be added once.` },
+      { m: `${T} = ${lin([[r + f, v]])}`, why: `You can't combine a one-time amount and a per-${u} rate into one rate.` },
+      { m: `${T} = ${lin([[r, v], [-f, '']])}`, why: `The ${money(f)} adds to the total, so it should be \`+ ${ns(f)}\`.` }];
+    hint = `Which number happens once, and which happens every ${u}? The one that repeats gets multiplied by \`${v}\`.`;
+    steps = [[`One-time amount: ${money(f)}. Per-${u} amount: ${money(r)}, which gets multiplied by \`${v}\`.`, ans],
+      [`Test it with \`${v} = 2\`: two ${u}s plus the one-time amount.`, `${T} = ${linSub(r, f, 2)} = ${ns(r2(r * 2 + f))}`]];
+  } else {
+    ans = `${T} = ${lin([[f, ''], [-r, v]])}`;
+    cands = [{ m: `${T} = ${lin([[f, ''], [r, v]])}`, why: 'The tank is losing water, so the per-minute amount is subtracted.' },
+      { m: `${T} = ${lin([[r, v], [-f, '']])}`, why: `Start with the ${f} gallons, then take away what drains: \`${f} - ${r}t\`.` },
+      { m: `${T} = ${lin([[-f, v], [r, '']])}`, why: `The ${f} is the starting amount. The ${r} is what changes each minute, so it goes with \`t\`.` },
+      { m: `${T} = ${lin([[f - r, v]])}`, why: "You can't combine the starting amount and the rate into one number." }];
+    hint = 'Start with the amount in the tank. Is water being added or taken away each minute?';
+    steps = [[`Start with ${f} gallons. Every minute, ${r} gallons leave, so subtract \`${r}t\`.`, ans],
+      ['Test it with `t = 2`: after two minutes, 2 × ' + r + ' gallons are gone.', `${T} = ${f} - ${r}(2) = ${f - 2 * r}`]];
+  }
+  return { q: a, quote: s, big: [], choices: mc({ m: ans }, cands, () => null), hint, steps, spec: { type: 'model', f, r, sign: M.neg ? -1 : 1, v, tot: T } };
+}
+
+const NAMES = ['Maria', 'Jalen', 'Luis', 'Aaliyah', 'Diego', 'Keisha', 'Andre', 'Sofia', 'Marcus', 'Jasmine', 'Carlos', 'Destiny', 'Isaiah', 'Valeria'];
+const HIS = { Maria: 'her', Aaliyah: 'her', Keisha: 'her', Sofia: 'her', Jasmine: 'her', Destiny: 'her', Valeria: 'her' };
+const PLANS = [
+  { u: 'month', us: 'months', verb: 'joined', f: [25, 30, 40, 50, 60], r: [15, 20, 25, 30], d: (f, r) => `a gym that charges a ${money(f)} sign-up fee plus ${money(r)} per month` },
+  { u: 'hour', us: 'hours', verb: 'hired', f: [40, 50, 60, 75], r: [20, 25, 30, 35], d: (f, r) => `a tutor who charges a ${money(f)} first-visit fee plus ${money(r)} per hour` },
+  { u: 'mile', us: 'miles', verb: 'rented', f: [20, 25, 30, 40], r: [0.5, 0.75, 1.25, 1.5], d: (f, r) => `a moving truck that costs ${money(f)} plus ${money(r)} per mile` },
+  { u: 'day', us: 'days', verb: 'rented', f: [15, 20, 30, 35], r: [10, 12, 15, 18], d: (f, r) => `a scooter that costs ${money(f)} to unlock plus ${money(r)} per day` }
+];
+
+function s2c() {
+  const r0 = Math.random();
+  if (r0 < 0.4) {
+    const P = pick(PLANS), f = pick(P.f), r = pick(P.r), n = rint(3, 12), T = r2(f + r * n), who = pick(NAMES), his = HIS[who] || 'his';
+    const W = v => ({ t: plural(v, P.u, P.us) });
+    const cands = [];
+    if (decs(T / r, 1) && T / r !== n) cands.push(Object.assign(W(T / r), { why: `You divided the whole bill by the rate. Take out the one-time ${money(f)} first.` }));
+    if (decs((T + f) / r, 1)) cands.push(Object.assign(W((T + f) / r), { why: `Subtract the ${money(f)} fee. Don't add it.` }));
+    cands.push(Object.assign(W(r2(T - f)), { why: `${money(T - f)} is what the ${P.us} cost. Divide by ${money(r)} to get the number of ${P.us}.` }));
+    const fb = numFb(n, v => v > 0 ? Object.assign(W(v), { why: `Check it: ${money(f)} + ${money(r)} × ${ns(v)} = ${money(f + r * v)}, not ${money(T)}.` }) : null);
+    return { q: `${who} ${P.verb} ${P.d(f, r)}. ${cap(his)} total bill was ${money(T)}. How many ${P.us} did ${who} pay for?`, big: [], choices: mc(W(n), cands, fb),
+      hint: `Write it as an equation: one-time fee + rate × ${P.us} = total. Then solve.`,
+      steps: [[`Let x be the number of ${P.us}. Fee + rate × ${P.us} = total.`, `${lin([[r, 'x'], [f, '']])} = ${ns(T)}`], [`Subtract the ${money(f)} fee from both sides.`, { t: 'bal', L: [[r, 'x'], [f, '']], R: [[T, '']], op: [-f, ''], dec: true }], [`Divide both sides by ${ns(r)}.`, { t: 'bal', L: [[r, 'x']], R: [[r2(T - f), '']], div: r, dec: true }]],
+      spec: { type: 'num', fn: 'paid', p: { T, f, r } } };
+  }
+  if (r0 < 0.75) {
+    const n = rint(3, 12), r1 = pick([20, 25, 30, 35, 40]), r2v = r1 - pick([5, 10]), f1 = pick([0, 10, 20, 25]), f2 = f1 + (r1 - r2v) * n;
+    const W = v => ({ t: plural(v, 'month') });
+    const cands = [];
+    if (isInt((f2 - f1) / (r1 + r2v))) cands.push(Object.assign(W((f2 - f1) / (r1 + r2v)), { why: `Subtract the monthly rates, don't add them. Each month Gym A costs ${money(r1 - r2v)} more.` }));
+    cands.push(Object.assign(W(f2 - f1), { why: `${money(f2 - f1)} is the difference in sign-up fees. Divide it by the difference in monthly rates, ${money(r1 - r2v)}.` }));
+    if (isInt((f1 + f2) / (r1 - r2v))) cands.push(Object.assign(W((f1 + f2) / (r1 - r2v)), { why: 'Subtract the sign-up fees, not add them.' }));
+    const fb = numFb(n, v => v > 0 ? Object.assign(W(v), { why: `Check it: after ${plural(v, 'month')}, Gym A costs ${money(f1 + r1 * v)} and Gym B costs ${money(f2 + r2v * v)}. Not equal.` }) : null);
+    const fee1 = f1 === 0 ? 'has no sign-up fee and charges' : `charges a ${money(f1)} sign-up fee plus`;
+    return { q: `Gym A ${fee1} ${money(r1)} per month. Gym B charges a ${money(f2)} sign-up fee plus ${money(r2v)} per month. After how many months will the two gyms have cost the same total?`, big: [],
+      choices: mc(W(n), cands, fb), hint: 'Write a cost equation for each gym, then set them equal.',
+      steps: [['Gym A = Gym B. Write each total with m for months.', `${lin([[r1, 'm'], [f1, '']])} = ${lin([[r2v, 'm'], [f2, '']])}`],
+        [`Subtract \`${r2v}m\` from both sides.`, { t: 'bal', L: [[r1, 'm'], [f1, '']], R: [[r2v, 'm'], [f2, '']], op: [-r2v, 'm'] }],
+        f1 ? [`Subtract ${f1} from both sides.`, { t: 'bal', L: [[r1 - r2v, 'm'], [f1, '']], R: [[f2, '']], op: [-f1, ''] }] : null,
+        [`Divide both sides by ${r1 - r2v}.`, { t: 'bal', L: [[r1 - r2v, 'm']], R: [[f2 - f1, '']], div: r1 - r2v }],
+        [`Check: Gym A ${money(f1 + r1 * n)}, Gym B ${money(f2 + r2v * n)} ✓`, null]].filter(Boolean),
+      spec: { type: 'num', fn: 'even', p: { f1, r1, f2, r2: r2v } } };
+  }
+  const P = pick(PLANS), f = pick(P.f), r = pick(P.r), k = rint(2, 9), ans = r2(f + r * k);
+  const vals = [ans, r * k, (f + r) * k, f * k + r];
+  const fm = moneyAll(vals);
+  const cands = [{ t: fm(r * k), why: `That's only the ${P.us}. Add the one-time ${money(f)} fee.` },
+    { t: fm((f + r) * k), why: `The ${money(f)} fee is charged once, not every ${P.u}.` },
+    { t: fm(f * k + r), why: `The ${money(r)} is the per-${P.u} amount, so multiply it by ${k}. The fee stays as is.` }];
+  return { q: `What is the total cost for ${plural(k, P.u, P.us)} with ${P.d(f, r)}?`, big: [], choices: mc({ t: fm(ans) }, cands, numFb(ans, v => ({ t: fm(v), why: 'Recheck: fee + rate × count.' }))),
+    hint: `One-time fee + rate × ${P.us}.`, steps: [['Fee plus rate times the count.', `${ns(f)} + ${coefAbs(r, '')}(${k}) = ${ns(ans)}`]], spec: { type: 'num', fn: 'cost', p: { f, r, k }, money: true } };
+}
+
+function s2d() {
+  const r0 = Math.random(), H = v => ({ t: plural(v, 'hour') });
+  if (r0 < 0.35) {
+    const kind = pick(['t', 'd', 'r']);
+    if (kind === 't') {
+      let rate, t, d; do { rate = pick([30, 35, 40, 45, 50, 55, 60, 65, 70]); t = pick([2, 3, 4, 5, 6, 1.5, 2.5, 3.5]); d = rate * t; } while (!isInt(d));
+      const cands = [{ t: plural(d * rate, 'hour'), why: 'Time = distance ÷ rate. You multiplied.' }, { t: plural(d - rate, 'hour'), why: 'Time = distance ÷ rate. Divide, don\'t subtract.' }];
+      if (decs(rate / d, 2)) cands.push(Object.assign(H(rate / d), { why: 'Upside down. Divide the distance by the rate.' }));
+      return { q: `A bus travels ${d} miles at an average speed of ${rate} miles per hour. How many hours does the trip take?`, big: [], choices: mc(H(t), cands, numFb(t, v => v > 0 ? Object.assign(H(v), { why: `Check: ${rate} × ${ns(v)} = ${ns(rate * v)} miles, not ${d}.` }) : null)),
+        hint: 'Use `d = rt`. You know d and r. Solve for t.', steps: [['Start with distance = rate × time.', `${d} = ${rate}t`], [`Divide both sides by ${rate}.`, `t = ${ns(t)}`]], spec: { type: 'num', fn: 'time', p: { d, r: rate } } };
+    }
+    if (kind === 'd') {
+      const rate = pick([10, 12, 14, 15, 16, 18]), t = pick([1.5, 2, 2.5, 3, 4]), d = rate * t;
+      const M = v => ({ t: plural(v, 'mile') });
+      const cands = [Object.assign(M(rate + t), { why: 'Distance = rate × time. Multiply, don\'t add.' })];
+      if (decs(rate / t, 1)) cands.push(Object.assign(M(rate / t), { why: 'Distance = rate × time. Multiply, don\'t divide.' }));
+      cands.push(Object.assign(M(rate * t * 2), { why: `Recheck: ${rate} miles each hour for ${ns(t)} hours.` }));
+      return { q: `A cyclist rides at ${rate} miles per hour for ${plural(t, 'hour')}. How far does she ride?`, big: [], choices: mc(M(d), cands, numFb(d, v => v > 0 ? Object.assign(M(v), { why: `Check: ${rate} × ${ns(t)} = ${ns(d)}.` }) : null)),
+        hint: 'Distance = rate × time.', steps: [['Distance = rate × time.', `d = ${rate}(${ns(t)}) = ${ns(d)}`]], spec: { type: 'num', fn: 'dist', p: { r: rate, t } } };
+    }
+    const t = pick([2, 3, 4, 5, 6]), rate = pick([45, 50, 55, 60, 65, 70, 75, 80]), d = rate * t;
+    const S = v => ({ t: `${ns(v)} miles per hour` });
+    const cands = [Object.assign(S(d * t), { why: 'Rate = distance ÷ time. You multiplied.' }), Object.assign(S(d - t), { why: 'Rate = distance ÷ time. Divide, don\'t subtract.' })];
+    if (decs(t / d, 2)) cands.push(Object.assign(S(t / d), { why: 'Upside down. Divide the distance by the time.' }));
+    return { q: `A train travels ${d} miles in ${t} hours. What is its average speed?`, big: [], choices: mc(S(rate), cands, numFb(rate, v => Object.assign(S(v), { why: `Check: ${ns(v)} × ${t} = ${ns(v * t)}, not ${d}.` }))),
+      hint: 'Use `d = rt`. You know d and t. Solve for r.', steps: [['Distance = rate × time.', `${d} = ${t}r`], [`Divide both sides by ${t}.`, `r = ${rate}`]], spec: { type: 'num', fn: 'rate', p: { d, t } } };
+  }
+  if (r0 < 0.85) {
+    const toward = chance(0.55);
+    let t, s1, s2, D; do { t = pick([1.5, 2, 2.5, 3, 4]); s1 = pick([40, 45, 50, 55, 60, 65]); s2 = pick([50, 55, 60, 65, 70, 75]); D = t * (s1 + s2); } while (!isInt(D) || s1 === s2);
+    const cands = [];
+    if (decs(D / Math.abs(s1 - s2), 2)) cands.push(Object.assign(H(D / Math.abs(s1 - s2)), { why: `Subtract speeds only when one is catching up to the other. ${toward ? 'Moving toward each other' : 'Moving apart'}, the gap changes by ${s1} + ${s2} = ${s1 + s2} miles every hour.` }));
+    if (decs(D / s1, 2)) cands.push(Object.assign(H(D / s1), { why: `That's how long the first one would take to cover all ${D} miles alone. Both are moving, so use the combined speed, ${s1 + s2} mph.` }));
+    if (decs(D / s2, 2)) cands.push(Object.assign(H(D / s2), { why: `Both are moving, so use the combined speed: ${s1} + ${s2} = ${s1 + s2} mph.` }));
+    const q = toward ? `Two friends live ${D} miles apart. They start driving toward each other at the same time, one at ${s1} mph and the other at ${s2} mph. How long until they meet?`
+      : `Two trucks leave the same rest stop at the same time and drive in opposite directions, one at ${s1} mph and the other at ${s2} mph. After how many hours will they be ${D} miles apart?`;
+    return { q, big: [], choices: mc(H(t), cands, numFb(t, v => v > 0 ? Object.assign(H(v), { why: `Check: in ${plural(v, 'hour')} they cover ${s1 + s2} × ${ns(v)} = ${ns((s1 + s2) * v)} miles together, not ${D}.` }) : null)),
+      hint: toward ? 'Moving toward each other, the gap shrinks by both speeds added together each hour.' : 'Moving in opposite directions, the gap grows by both speeds added together each hour.',
+      steps: [[`The distance between them changes by ${s1} + ${s2} = ${s1 + s2} miles every hour.`, `${s1 + s2}t = ${D}`], [`Divide by ${s1 + s2}.`, `t = ${ns(t)}`]],
+      spec: { type: 'num', fn: 'combined', p: { D, s1, s2 } } };
+  }
+  let s1, h, t, d; do { s1 = pick([10, 12, 15, 20]); h = pick([1, 2]); t = pick([0.5, 1, 1.5, 2]); d = s1 * h / t; } while (!isInt(d) || s1 + d > 75);
+  const s2 = s1 + d, cands = [];
+  if (decs(s1 * h / (s1 + s2), 2)) cands.push(Object.assign(H(s1 * h / (s1 + s2)), { why: `When one is catching up, subtract the speeds. The car gains ${s2} − ${s1} = ${d} miles on the cyclist each hour.` }));
+  cands.push(Object.assign(H(h), { why: `${plural(h, 'hour')} is the head start, not the time to catch up.` }));
+  if (decs(s1 * h / s2, 2)) cands.push(Object.assign(H(s1 * h / s2), { why: `The cyclist keeps moving, so the car only gains ${d} mph on her, not ${s2}.` }));
+  return { q: `A cyclist leaves school riding at ${s1} mph. ${cap(plural(h, 'hour'))} later, a car leaves the school on the same road at ${s2} mph. How long after the car leaves will it catch up to the cyclist?`, big: [],
+    choices: mc(H(t), cands, numFb(t, v => v > 0 ? Object.assign(H(v), { why: `Check: the head start is ${s1 * h} miles and the car gains ${d} miles each hour.` }) : null)),
+    hint: 'Find the cyclist\'s head start in miles. Then figure out how fast the car closes that gap.',
+    steps: [[`Head start: ${s1} mph × ${plural(h, 'hour')} = ${s1 * h} miles.`, null], [`The car gains ${s2} − ${s1} = ${d} miles every hour.`, `${d}t = ${s1 * h}`], [`Divide by ${d}.`, `t = ${ns(t)}`]],
+    spec: { type: 'num', fn: 'catch', p: { s1, s2, h } } };
+}
+
+/* ===================================================================
+   MODULE 3  Percents & proportions
+   =================================================================== */
+
+function mental(P, W) { // e.g. 35% of 80: 3(8) + 4
+  if (P % 5 !== 0 || P > 90 || !isInt(W / 20)) return null;
+  const tens = Math.floor(P / 10), five = P % 10 === 5, parts = [];
+  if (tens) parts.push(tens === 1 ? ns(W / 10) : `${tens}(${ns(W / 10)})`);
+  if (five) parts.push(ns(W / 20));
+  return [`Mental math: 10% of ${W} is ${ns(W / 10)}${five ? `, and 5% is half of that, ${ns(W / 20)}` : ''}.`, `${parts.join(' + ')} = ${ns(P * W / 100)}`];
+}
+
+function s3a() {
+  const r0 = Math.random();
+  if (r0 < 0.4) {
+    let P, W, a, tries = 0; do { P = pick([10, 20, 25, 30, 40, 50, 60, 75, 15, 35, 45, 5, 80]); W = pick([20, 40, 60, 80, 120, 140, 160, 200, 240, 300, 360, 480]); a = P * W / 100; tries++; } while (!isInt(a) && tries < 50);
+    const cands = [{ m: ns(a * 10), why: `Decimal slip. 10% of ${W} is ${ns(W / 10)}: move the decimal point one place left, not zero places.` }, { m: ns(a / 10), why: `Decimal slip. 10% of ${W} is ${ns(W / 10)}: move the decimal point one place left, not two.` },
+      W - P > 0 ? { m: ns(W - P), why: `Subtracting doesn't find a percent. Start with 10% of ${W}, which is ${ns(W / 10)}, and build ${P}% from that.` } : null,
+      { m: ns(W + a), why: `That's ${W} increased by ${P}%. The question only asks for ${P}% of ${W}.` }];
+    return { q: `What is ${P}% of ${W}?`, big: [], choices: mc({ m: ns(a) }, cands, numFb(a, v => ({ m: ns(v), why: `Recheck: 10% of ${W} is ${ns(W / 10)}. Build ${P}% from that.` }))),
+      hint: 'Use the 10% method: move the decimal point one place left to get 10%. Then build the percent you need from that piece.',
+      steps: [[[5, 10, 25, 50].includes(P) ? 'Use the 10% method: find the easy pieces.' : `Use the 10% method: find the easy pieces, then build ${P}% from them.`, pctLadder(P, W)]], spec: { type: 'num', fn: 'pctOf', p: { P, W } } };
+  }
+  if (r0 < 0.7) {
+    let P, W, part; do { W = pick([20, 24, 25, 40, 48, 50, 60, 64, 72, 80, 120, 200]); P = pick([5, 10, 20, 25, 40, 50, 60, 75, 80, 15]); part = W * P / 100; } while (!isInt(part));
+    const fr = `\`{${part}/${W}}\``;
+    const cands = [isInt(W / part * 100) ? { t: pct(W / part * 100), why: `Upside down. The part (${part}) goes on top of the whole (${W}): ${fr}.` } : null,
+      { t: pct(W - part), why: `Subtracting doesn't make a percent. Write ${fr}, then make the bottom 100.` },
+      { t: pct(part / W), why: `${ns(part / W)} is the decimal. Make the bottom 100 instead: the top number is the percent.` }];
+    return { q: `${part} is what percent of ${W}?`, big: [], choices: mc({ t: pct(P) }, cands, numFb(P, v => v > 0 ? { t: pct(v), why: `Check: ${ns(v)}% of ${W} is ${ns(v * W / 100)}, not ${part}.` } : null)),
+      hint: 'Write the part over the whole. Simplify, then make the bottom 100. The top number is the percent.',
+      steps: hundredSteps(part, W, P, 'Write the part over the whole.'), spec: { type: 'num', fn: 'whatPct', p: { part, W } } };
+  }
+  let P, W, part; do { P = pick([10, 20, 25, 40, 50, 75, 30, 60, 15]); W = pick([20, 40, 60, 80, 100, 120, 160, 200, 240]); part = P * W / 100; } while (!isInt(part));
+  const cands = [decs(part * P / 100, 2) ? { m: ns(part * P / 100), why: `You found ${P}% of ${part}. But ${part} is already ${P}% of the number, so work up to 100%.` } : null,
+    decs(part * (100 + P) / 100, 2) ? { m: ns(part * (100 + P) / 100), why: `That's ${part} increased by ${P}%. Work from ${P}% down to a friendly percent, then up to 100%.` } : null,
+    { m: ns(part + P), why: `Adding the percent doesn't work. Work from ${P}% down to a friendly percent, then up to 100%.` }];
+  return { q: `${part} is ${P}% of what number?`, big: [], choices: mc({ m: ns(W) }, cands, numFb(W, v => v > 0 ? { m: ns(v), why: `Check: ${P}% of ${ns(v)} is ${ns(P * v / 100)}, not ${part}.` } : null)),
+    hint: `${part} is ${P}% of the number. Divide to get a friendly percent like 10%, then multiply up to 100%.`,
+    steps: [[`You know ${P}% of the number is ${part}. Work down to a friendly percent, then up to 100%.`, wholeLadder(P, part)]],
+    spec: { type: 'num', fn: 'whole', p: { part, P } } };
+}
+
+function s3b() {
+  const r0 = Math.random();
+  if (r0 < 0.3) {
+    const item = pick(['jacket', 'pair of shoes', 'backpack', 'video game', 'hoodie', 'pair of headphones']);
+    const Pr = pick([20, 24, 30, 36, 40, 45, 48, 50, 60, 64, 72, 80, 90, 120]), d = pick([10, 15, 20, 25, 30, 40, 50]), sale = Pr * (100 - d) / 100, disc = Pr * d / 100;
+    const fm = moneyAll([sale, disc, Pr - d, Pr * (100 + d) / 100]);
+    const cands = [{ t: fm(disc), why: `That's how much you save. Subtract it from ${money(Pr)} to get what you pay.` },
+      Pr - d > 0 ? { t: fm(Pr - d), why: `${d}% off is not ${money(d)} off. Find ${d}% of ${money(Pr)} first with the 10% method.` } : null,
+      { t: fm(Pr * (100 + d) / 100), why: 'A discount lowers the price. You added.' }];
+    return { q: `A ${item} costs ${money(Pr)}. It is on sale for ${d}% off. What is the sale price?`, big: [], choices: mc({ t: fm(sale) }, cands, numFb(sale, v => ({ t: fm(v), why: `Recheck: find ${d}% of ${money(Pr)}, then subtract it.` }))),
+      hint: `Find ${d}% of ${money(Pr)} with the 10% method, then subtract it from the price.`,
+      steps: [[`Find the discount, ${d}% of ${money(Pr)}, with the 10% method.`, pctLadder(d, Pr, true)], [`Subtract the ${money(disc)} discount from the price.`, `${Pr} - ${cash(disc)} = ${cash(sale)}`]],
+      spec: { type: 'num', fn: 'sale', p: { P: Pr, d }, money: true } };
+  }
+  if (r0 < 0.5) {
+    const Pr = pick([20, 40, 60, 80, 100, 120, 160, 200]), tax = Pr * 0.0825, tot = Pr + tax, item = pick(['a pair of sneakers', 'a calculator', 'a phone case', 'a jersey', 'a lamp']);
+    const fm = v => '$' + r2(v).toFixed(2);
+    const cands = [{ t: fm(tax), why: `That's just the tax. Add it to the ${money(Pr)} price.` }, { t: fm(Pr + 8.25), why: `8.25% of ${money(Pr)} is not ${money(8.25)}. Start with 1% of ${money(Pr)}, which is $${(Pr / 100).toFixed(2)}.` },
+      { t: fm(Pr * 1.825), why: 'Decimal slip. 1% means moving the decimal point two places left, so the tax is ten times smaller than this.' }];
+    return { q: `Dallas sales tax is 8.25%. What is the total cost of ${item} priced at ${money(Pr)}, including tax?`, big: [], choices: mc({ t: fm(tot) }, cands, numFb(tot, v => ({ t: fm(v), why: 'Recheck: find the tax, then add it to the price.' }))),
+      hint: 'Find 1% of the price by moving the decimal point two places left. 8.25% is 8 of those, plus a quarter of one more.',
+      steps: [[`Find the tax, 8.25% of ${money(Pr)}. Start with 1%, then build 8.25%.`, pctLadder(8.25, Pr, true)], ['Add the tax to the price.', `${Pr} + ${r2(tax).toFixed(2)} = ${r2(tot).toFixed(2)}`]],
+      spec: { type: 'num', fn: 'tax', p: { P: Pr }, money: true } };
+  }
+  if (r0 < 0.75) {
+    let o, p, up, nw; do { o = pick([20, 25, 40, 50, 60, 80, 100, 120, 150, 200]); p = pick([10, 20, 25, 40, 50, 75, 30, 60]); up = chance(0.55); nw = o * (up ? 100 + p : 100 - p) / 100; } while (!isInt(nw));
+    const ch = Math.abs(nw - o), word = up ? 'increase' : 'decrease', thing = pick(['A ticket', 'A monthly bus pass', 'A school hoodie', 'A pizza']), fr = `\`{${ch}/${o}}\``;
+    const cands = [isInt(ch / nw * 100) ? { t: pct(ch / nw * 100), why: `Put the change over the <b>original</b> price, ${money(o)}, not the new one: ${fr}.` } : null,
+      ch !== p ? { t: pct(ch), why: `${money(ch)} is the change in dollars, not the percent. Write ${fr} and make the bottom 100.` } : null,
+      { t: pct(nw / o * 100), why: `Use the <b>change</b> on top, not the new price: ${fr}.` }];
+    return { q: `${thing} went from ${money(o)} to ${money(nw)}. What is the percent ${word}?`, big: [], choices: mc({ t: pct(p) }, cands, numFb(p, v => v > 0 ? { t: pct(v), why: `Recheck: write ${fr}, simplify, and make the bottom 100.` } : null)),
+      hint: 'Write the change over the original price. Simplify, then make the bottom 100.',
+      steps: [[`Find the change: ${up ? 'new price minus original price' : 'original price minus new price'}.`, `${Math.max(nw, o)} - ${Math.min(nw, o)} = ${ch}`]].concat(hundredSteps(ch, o, p, 'Write the change over the original price.')).concat([[`That's a ${p}% ${word}.`, null]]),
+      spec: { type: 'num', fn: 'change', p: { o, n: nw } } };
+  }
+  let O, d, F; do { O = pick([20, 25, 30, 40, 50, 60, 75, 80, 100, 120]); d = pick([10, 20, 25, 40, 50]); F = O * (100 - d) / 100; } while (!decs(F, 2));
+  const pay = 100 - d, fm = moneyAll([O, F * (100 + d) / 100, F * (100 - d) / 100, F + d]);
+  const cands = [{ t: fm(F * (100 + d) / 100), why: `Adding ${d}% of the sale price doesn't undo the discount, because the ${d}% was taken from the <b>original</b> price. ${money(F)} is ${pay}% of the original, so work from ${pay}% up to 100%.` },
+    { t: fm(F * (100 - d) / 100), why: 'The original price has to be higher than the sale price.' }, { t: fm(F + d), why: `${d}% off is not ${money(d)} off. ${money(F)} is ${pay}% of the original, so work from ${pay}% up to 100%.` }];
+  return { q: `After a ${d}% discount, a shirt costs ${money(F)}. What was the original price?`, big: [], choices: mc({ t: fm(O) }, cands, numFb(O, v => v > 0 ? { t: fm(v), why: `Check: ${d}% off ${money(v)} is ${money(v * (100 - d) / 100)}.` } : null)),
+    hint: `You paid ${pay}% of the original price. Divide to get a friendly percent like 10%, then multiply up to 100%.`,
+    steps: [[`After ${d}% off, you paid 100% − ${d}% = ${pay}% of the original price, and that was ${money(F)}.`, null],
+      ['Work down to a friendly percent, then up to 100%.', wholeLadder(pay, F, true)],
+      [`Check: ${d}% of ${money(O)} is ${money(O * d / 100)}, and ${money(O)} − ${money(O * d / 100)} = ${money(F)} ✓`, null]],
+    spec: { type: 'num', fn: 'orig', p: { F, d }, money: true } };
+}
+
+const SCALES = [
+  { mk: (a, b, c) => `A recipe uses ${a} cups of flour to make ${b} dozen cookies. How many cups of flour are needed for ${c} dozen cookies?`, u: 'cup', us: 'cups', top: 'cups', bot: 'dozen' },
+  { mk: (a, b, c) => `A car uses ${a} gallons of gas to drive ${b * 30} miles. How many gallons does it need to drive ${c * 30} miles?`, u: 'gallon', us: 'gallons', top: 'gallons', bot: 'miles', k: 30 },
+  { mk: (a, b, c) => `${a} cans of paint cover ${b * 100} square feet of wall. How many cans are needed for ${c * 100} square feet?`, u: 'can', us: 'cans', top: 'cans', bot: 'square feet', k: 100 },
+  { mk: (a, b, c) => `A school orders ${a} pizzas for every ${b * 4} students. How many pizzas are needed for ${c * 4} students?`, u: 'pizza', us: 'pizzas', top: 'pizzas', bot: 'students', k: 4, int: true }
+];
+
+function s3c() {
+  const r0 = Math.random();
+  if (r0 < 0.35) {
+    const S = pick(SCALES), k = S.k || 1; let a, b, c, ans;
+    do { a = rint(1, 9); b = rint(2, 8); c = rint(2, 12); ans = a * c / b; } while (c === b || !decs(ans, 1) || (S.int && !isInt(ans)) || ans === a);
+    const W = v => ({ t: plural(v, S.u, S.us) });
+    const cands = [];
+    if (decs(b * c / a, 1)) cands.push(Object.assign(W(b * c / a), { why: `Upside down. Keep ${S.top} on top of both fractions: \`{${a}/${b * k}} = {x/${c * k}}\`.` }));
+    if (a + (c - b) > 0) cands.push(Object.assign(W(a + (c - b)), { why: 'Proportions scale by multiplying. Adding the same amount to both doesn\'t keep the ratio.' }));
+    cands.push(Object.assign(W(a * c), { why: `Use the butterfly method: \`${b * k}x = ${a} * ${c * k}\`. Then divide by ${b * k}.` }));
+    return { q: S.mk(a, b, c), big: [], choices: mc(W(ans), cands, numFb(ans, v => v > 0 ? Object.assign(W(v), { why: `Check the ratio: ${a} for ${b * k} should equal ${ns(v)} for ${c * k}.` }) : null)),
+      hint: `Set up two matching fractions with ${S.top} on top and ${S.bot} on the bottom.`,
+      steps: [[`Set up matching fractions with ${S.top} on top and ${S.bot} on the bottom. Then use the butterfly method.`, { t: 'bf', a: ns(a), b: ns(b * k), c: 'x', d: ns(c * k) }],
+        mulParts(a, c * k), [`Divide both sides by ${b * k}.`, { t: 'bal', L: [[b * k, 'x']], R: [[a * c * k, '']], div: b * k, dec: true }]].filter(Boolean),
+      spec: { type: 'num', fn: 'scale', p: { a, b: b * k, c: c * k } } };
+  }
+  if (r0 < 0.65) {
+    const G = pick([['boys', 'girls', 'students in the club'], ['red marbles', 'blue marbles', 'marbles in the bag'], ['cats', 'dogs', 'animals at the shelter'], ['wins', 'losses', 'games played (no ties)']]);
+    let p, q, T; do { p = rint(1, 7); q = rint(2, 8); T = (p + q) * rint(3, 12); } while (p === q || gcd(p, q) !== 1);
+    const ans = T * q / (p + q), W = v => ({ m: ns(v) });
+    const cands = [Object.assign(W(T * p / (p + q)), { why: `That's the number of ${G[0]}. The question asks for ${G[1]}.` }),
+      Object.assign(W(T / (p + q)), { why: `That's one share (${T} ÷ ${p + q}). The ${G[1]} get ${q} shares.` }),
+      isInt(T * q / p) ? Object.assign(W(T * q / p), { why: `${p}:${q} compares ${G[0]} to ${G[1]}, not to the total. The total is ${p} + ${q} = ${p + q} shares.` }) : null,
+      T - q > 0 ? Object.assign(W(T - q), { why: `Ratios are shares, not counts. Split ${T} into ${p + q} equal shares first.` }) : null];
+    return { q: `The ratio of ${G[0]} to ${G[1]} is ${p}:${q}. There are ${T} ${G[2]}. How many are ${G[1]}?`, big: [], choices: mc(W(ans), cands, numFb(ans, v => v > 0 ? Object.assign(W(v), { why: `Split ${T} into ${p + q} equal shares of ${T / (p + q)}. ${cap(G[1])} get ${q} of them.` }) : null)),
+      hint: `Add the parts of the ratio to get the number of equal shares: ${p} + ${q}.`,
+      steps: [[`Total shares: ${p} + ${q} = ${p + q}.`, null], [`One share is ${T} ÷ ${p + q}.`, `${T} ÷ ${p + q} = ${T / (p + q)}`], [`${cap(G[1])} get ${q} shares.`, `${q} * ${T / (p + q)} = ${ns(ans)}`]],
+      spec: { type: 'num', fn: 'ratio', p: { p, q, T } } };
+  }
+  if (r0 < 0.85) {
+    const s = pick([10, 20, 25, 40, 50, 60]), inches = pick([1.5, 2, 2.5, 3, 3.5, 4.5, 6]), miles = s * inches;
+    if (chance(0.5)) {
+      const W = v => ({ t: plural(v, 'mile') });
+      const cands = [Object.assign(W(s + inches), { why: 'Each inch stands for ' + s + ' miles, so multiply.' }), decs(s / inches, 1) ? Object.assign(W(s / inches), { why: 'Multiply the inches by ' + s + ', don\'t divide.' }) : null, Object.assign(W(miles * 2), { why: `Recheck: ${ns(inches)} × ${s}.` })];
+      return { q: `On a map, 1 inch represents ${s} miles. Two towns are ${plural(inches, 'inch', 'inches')} apart on the map. How far apart are they in real life?`, big: [], choices: mc(W(miles), cands, numFb(miles, v => v > 0 ? Object.assign(W(v), { why: `Check: ${ns(inches)} inches × ${s} miles per inch = ${ns(miles)} miles.` }) : null)),
+        hint: 'Every inch on the map is ' + s + ' miles.', steps: [['Set up matching fractions with inches on top and miles on the bottom. Then use the butterfly method.', { t: 'bf', a: '1', b: ns(s), c: ns(inches), d: 'x' }], mulParts(s, inches), [`The towns are ${ns(miles)} miles apart.`, `x = ${ns(miles)}`]].filter(Boolean), spec: { type: 'num', fn: 'map', p: { s, i: inches } } };
+    }
+    const W = v => ({ t: plural(v, 'inch', 'inches') });
+    const cands = [Object.assign(W(miles * s), { why: `Divide the miles by ${s}, don't multiply.` }), decs(s / miles, 2) ? Object.assign(W(s / miles), { why: `Upside down. Divide ${ns(miles)} by ${s}.` }) : null, Object.assign(W(miles - s), { why: `Divide by ${s}, don't subtract.` })];
+    return { q: `On a map, 1 inch represents ${s} miles. Two cities are ${ns(miles)} miles apart. How far apart are they on the map?`, big: [], choices: mc(W(inches), cands, numFb(inches, v => v > 0 ? Object.assign(W(v), { why: `Check: ${ns(v)} inches would be ${ns(v)} × ${s} = ${ns(v * s)} miles, not ${ns(miles)}.` }) : null)),
+      hint: `How many groups of ${s} miles fit in ${ns(miles)} miles?`, steps: [['Set up matching fractions with inches on top and miles on the bottom. Then use the butterfly method.', { t: 'bf', a: '1', b: ns(s), c: 'x', d: ns(miles) }], [`Divide both sides by ${s}.`, { t: 'bal', L: [[s, 'x']], R: [[miles, '']], div: s, dec: true }]], spec: { type: 'num', fn: 'mapRev', p: { s, mi: miles } } };
+  }
+  let a, b, c, x; do { a = rint(2, 12); b = rint(2, 12); c = rint(2, 12); x = a * b / c; } while (!isInt(x) || c === b || x === a);
+  const cands = [decs(a * c / b, 1) ? { m: ns(a * c / b), why: `Use the butterfly method: x pairs with ${c} and ${a} pairs with ${b}, so \`${c}x = ${a} * ${b}\`. Then divide by ${c}.` } : null, a + b - c > 0 ? { m: ns(a + b - c), why: 'Proportions use multiplying, not adding and subtracting.' } : null, isInt(b * c / a) ? { m: ns(b * c / a), why: `Follow the butterfly wings: x with ${c}, and ${a} with ${b}.` } : null];
+  return { q: 'Solve the proportion for `x`.', big: [`{x/${a}} = {${b}/${c}}`], choices: mc({ m: ns(x) }, cands, numFb(x, v => v > 0 ? { m: ns(v), why: 'Use the butterfly method, then divide.' } : null)),
+    hint: 'Use the butterfly method: multiply along each wing (the diagonals) and set the two products equal.',
+    steps: [['Use the butterfly method: multiply along each wing.', { t: 'bf', a: 'x', b: ns(a), c: ns(b), d: ns(c) }], mulParts(a, b), [`Divide both sides by ${c}.`, { t: 'bal', L: [[c, 'x']], R: [[a * b, '']], div: c }]].filter(Boolean), spec: { type: 'solve', eq: `{x/${a}} = {${b}/${c}}`, v: 'x' } };
+}
+
+function mixPiece(sub, p, V, which) {
+  const ten = r4(V / 10), tens = Math.floor(p / 10), five = p % 10 === 5, total = r4(V * p / 100);
+  const say = `${cap(sub)} in the ${which} part is ${p}% of ${V} liters. 10% of ${V} is ${ns(ten)}${five ? `, and 5% is half of that, ${ns(r4(ten / 2))}` : ''}.`;
+  let m;
+  if (p === 10) m = `${V} ÷ 10 = ${ns(ten)}`;
+  else if (p === 5) m = `${ns(ten)} ÷ 2 = ${ns(total)}`;
+  else m = `${tens === 1 ? ns(ten) : `${tens} * ${ns(ten)}`}${five ? ` + ${ns(r4(ten / 2))}` : ''} = ${ns(total)}`;
+  return [say, m];
+}
+function s3d() {
+  const r0 = Math.random();
+  if (r0 < 0.3) {
+    const it = pick([['bottles of water', 'bottle'], ['granola bars', 'bar'], ['pencils', 'pencil'], ['cans of soda', 'can']]);
+    const n = pick([4, 6, 8, 10, 12, 16, 20, 24]), per = pick([0.25, 0.35, 0.45, 0.6, 0.75, 1.25, 1.5, 0.85]), P = r2(n * per);
+    const fm = v => '$' + r2(v).toFixed(2);
+    const cands = [{ t: fm(per * 10), why: 'Decimal slip. Divide carefully: price ÷ number of items.' }, { t: fm(n / P), why: `That's ${it[0]} per dollar. Price per ${it[1]} is the price divided by the count.` }, P - n > 0 ? { t: fm(P - n), why: 'Divide the price by the count, don\'t subtract.' } : null];
+    return { q: `A pack of ${n} ${it[0]} costs ${money(P)}. What is the price per ${it[1]}?`, big: [], choices: mc({ t: fm(per) }, cands, numFb(per, v => v > 0 ? { t: fm(v), why: `Check: ${n} × ${fm(v)} = ${fm(n * v)}.` } : null)),
+      hint: 'Unit price = total price ÷ number of items.', steps: [['Divide the price by the number of items.', `${P.toFixed(2)} ÷ ${n} = ${per.toFixed(2)}`]], spec: { type: 'num', fn: 'unit', p: { P, n }, money: true } };
+  }
+  if (r0 < 0.55) {
+    let a, b, c, ans; do { a = pick([6, 8, 10, 12, 15, 18, 20, 24]); b = rint(2, 6); c = a * rint(2, 8) * pick([1, 0.5]); ans = b * c / a; } while (!isInt(c) || !decs(ans, 1) || c === a);
+    const W = v => ({ t: plural(v, 'minute') });
+    const cands = [Object.assign(W(c / a), { why: `${ns(c / a)} is how many batches of ${a} pages. Each batch takes ${b} minutes, so multiply.` }), decs(a * c / b, 1) ? Object.assign(W(a * c / b), { why: `Upside down. Keep minutes on top: \`{${b}/${a}} = {x/${c}}\`.` }) : null, c - a + b > 0 ? Object.assign(W(c - a + b), { why: 'Rates scale by multiplying, not by adding.' }) : null];
+    return { q: `A printer prints ${a} pages in ${b} minutes. At that rate, how many minutes will it take to print ${c} pages?`, big: [], choices: mc(W(ans), cands, numFb(ans, v => v > 0 ? Object.assign(W(v), { why: `Check: at ${a} pages every ${b} minutes, ${ns(v)} minutes prints ${ns(v * a / b)} pages, not ${c}.` }) : null)),
+      hint: 'Set up minutes over pages on both sides, or find how many minutes one page takes.', steps: [['Set up matching fractions with minutes on top and pages on the bottom. Then use the butterfly method.', { t: 'bf', a: ns(b), b: ns(a), c: 'x', d: ns(c) }], mulParts(b, c), [`Divide both sides by ${a}.`, { t: 'bal', L: [[a, 'x']], R: [[b * c, '']], div: a, dec: true }]].filter(Boolean),
+      spec: { type: 'num', fn: 'scale', p: { a: b, b: a, c } } };
+  }
+  if (r0 < 0.8) {
+    let V1, V2, p1, p2, res; do { V1 = rint(1, 9); V2 = rint(1, 9); p1 = pick([5, 10, 15, 20, 25, 30]); p2 = pick([20, 30, 40, 50, 60]); res = (V1 * p1 + V2 * p2) / (V1 + V2); } while (p1 >= p2 || !isInt(res) || V1 === V2);
+    const sub = pick(['salt', 'juice', 'acid']);
+    const cands = [{ t: pct((p1 + p2) / 2), why: `Averaging ${p1}% and ${p2}% only works when the amounts are equal. Here they aren't, so find the total ${sub} first.` }, { t: pct(p1 + p2), why: `Percents don't add. Find the total amount of ${sub}, then divide by the total liters.` }, isInt((V2 * p1 + V1 * p2) / (V1 + V2)) ? { t: pct((V2 * p1 + V1 * p2) / (V1 + V2)), why: `The weights are swapped. The ${V1} liters are the ${p1}% mix.` } : null];
+    const s1 = V1 * p1 / 100, s2 = V2 * p2 / 100;
+    return { q: `A chemist mixes ${V1} liters of a ${p1}% ${sub} solution with ${V2} liters of a ${p2}% ${sub} solution. What percent ${sub} is the mixture?`, big: [], choices: mc({ t: pct(res) }, cands, numFb(res, v => v > 0 ? { t: pct(v), why: `Find the liters of ${sub}: ${ns(s1)} + ${ns(s2)}.` } : null)),
+      hint: `Find how many liters of pure ${sub} are in each part, add them, then divide by the total liters.`,
+      steps: [mixPiece(sub, p1, V1, 'first'), mixPiece(sub, p2, V2, 'second'), [`Total ${sub} ÷ total liters.`, `${ns(s1 + s2)} ÷ ${V1 + V2} = ${ns(res / 100)} = ${ns(res)}%`]],
+      spec: { type: 'num', fn: 'mix', p: { V1, p1, V2, p2 } } };
+  }
+  let n, a, b, c, x; do { n = pick([4, 5, 6, 8, 10, 12, 15, 20]); a = pick([10, 20, 30]); b = pick([40, 50, 60, 70, 80]); c = pick([20, 25, 30, 40, 50, 60]); x = n * (c - a) / (b - c); } while (!(a < c && c < b) || !isInt(x) || x === n);
+  const W = v => ({ t: plural(v, 'liter') });
+  const cands = [Object.assign(W(n), { why: `Equal amounts would land exactly halfway, at ${ns((a + b) / 2)}%. You want ${c}%.` }), isInt(n * (b - c) / (c - a)) ? Object.assign(W(n * (b - c) / (c - a)), { why: 'The two differences are flipped. Check it by finding the total salt.' }) : null, Object.assign(W(c - a), { why: `Set up \`${ns(a / 100)}(${n}) + ${ns(b / 100)}x = ${ns(c / 100)}(${n} + x)\` and solve.` })];
+  return { q: `How many liters of a ${b}% salt solution must be added to ${n} liters of a ${a}% salt solution to make a ${c}% salt solution?`, big: [], choices: mc(W(x), cands, numFb(x, v => v > 0 ? Object.assign(W(v), { why: `Check: salt = ${ns(a / 100 * n)} + ${ns(b / 100)}(${ns(v)}) = ${ns(a / 100 * n + b / 100 * v)} liters out of ${ns(n + v)}.` }) : null)),
+    hint: 'Salt in + salt added = salt in the final mix. Let x be the liters you add.',
+    steps: [['Salt before + salt added = salt after.', `${ns(a / 100)}(${n}) + ${ns(b / 100)}x = ${ns(c / 100)}(${n} + x)`], ['Multiply out.', `${ns(a / 100 * n)} + ${ns(b / 100)}x = ${ns(c / 100 * n)} + ${ns(c / 100)}x`], ['Collect x-terms and numbers.', `${ns((b - c) / 100)}x = ${ns((c - a) / 100 * n)}`], [`Divide by ${ns((b - c) / 100)}.`, `x = ${x}`]],
+    spec: { type: 'num', fn: 'mixAdd', p: { n, a, b, c } } };
+}
+
+/* ===================================================================
+   MODULE 4  Functions & graph behavior
+   =================================================================== */
+
+function s4a() {
+  const r0 = Math.random();
+  if (r0 < 0.3) {
+    const a = nz(-7, 9), b = nz(-12, 12), k = nz(-6, 8), ans = a * k + b, f = lin([[a, 'x'], [b, '']]);
+    const cands = [k !== 0 ? { m: ns(a * -k + b), why: `Plug in ${N(k)} exactly, sign included. Use parentheses: \`${linSub(a, b, k)}\`.` } : null, { m: ns(a * k - b), why: `Keep the sign of the constant: it's \`${pm(b)}\`.` }, { m: ns(a + k + b), why: `\`${lin([[a, 'x']])}\` means ${N(a)} <b>times</b> x.` }];
+    return { q: `If \`f(x) = ${f}\`, what is \`f(${ns(k)})\`?`, big: [], choices: mc({ m: ns(ans) }, cands, numFb(ans, v => ({ m: ns(v), why: `Recheck: \`${linSub(a, b, k)}\`.` }))),
+      hint: `Replace every x with \`(${ns(k)})\`, in parentheses.`, steps: [[`Replace x with \`(${ns(k)})\`.`, `f(${ns(k)}) = ${linSub(a, b, k)}`], ['Multiply, then add.', `= ${ns(a * k)} ${pm(b)} = ${ans}`]],
+      spec: { type: 'eval', f, at: k } };
+  }
+  if (r0 < 0.7) {
+    const a = pick([1, 2, 3, -1, -2]), b = nz(-5, 5), c = rint(-6, 8), k = pick([-1, -2, -3, 2, 3, -4]);
+    const f = lin([[a, 'x^2'], [b, 'x'], [c, '']]), ans = a * k * k + b * k + c, sq = k * k;
+    const cands = [{ m: ns(a * -sq + b * k + c), why: `\`(${k})^2 = ${sq}\`, a positive number. Squaring a negative gives a positive.` },
+      Math.abs(a) !== 1 ? { m: ns(a * a * k * k + b * k + c), why: `Only the x is squared, not the ${N(a)}: \`${a}(${k})^2 = ${a}(${sq})\`.` } : null,
+      b * k !== 0 ? { m: ns(a * sq - b * k + c), why: `Watch the sign on the middle term: \`${coefSub(b, k)} = ${b * k}\`.` } : null,
+      { m: ns(a * 2 * k + b * k + c), why: `\`x^2\` means x times x, not x times 2: \`(${k})^2 = ${sq}\`.` }];
+    const term1 = a === 1 ? `(${k})^2` : a === -1 ? `-(${k})^2` : `${a}(${k})^2`;
+    let expr = term1 + (b ? ` ${b < 0 ? '-' : '+'} ${coefSub(Math.abs(b), k)}` : '') + (c ? ` ${pm(c)}` : '');
+    const t1v = a * sq, t2v = b * k;
+    return { q: `If \`f(x) = ${f}\`, what is \`f(${k})\`?`, big: [], choices: mc({ m: ns(ans) }, cands, numFb(ans, v => ({ m: ns(v), why: `Recheck each term: \`${expr}\`.` }))),
+      hint: `Put \`(${k})\` in parentheses everywhere you see x. Square first, then multiply.`,
+      steps: [[`Replace every x with \`(${k})\`.`, `f(${k}) = ${expr}`], [`Square first: \`(${k})^2 = ${sq}\`. Then multiply.`, `= ${ns(t1v)} ${pm(t2v)} ${c ? pm(c) : ''}`.trim()], ['Add it up.', `= ${ans}`]],
+      spec: { type: 'eval', f, at: k } };
+  }
+  const a = nz(-6, 7), b = nz(-12, 12), x0 = nz(-6, 8), T = a * x0 + b, f = lin([[a, 'x'], [b, '']]);
+  const cands = [{ m: ns(a * T + b), why: `That's \`f(${T})\`. Here ${N(T)} is the <b>output</b>, so set \`${f} = ${T}\` and solve for x.` }, isInt((T + b) / a) ? { m: ns((T + b) / a), why: `To undo \`${pm(b)}\`, ${b > 0 ? 'subtract' : 'add'} ${Math.abs(b)}.` } : null, { m: ns(T - b), why: `You got \`${lin([[a, 'x']])} = ${T - b}\`. Divide by ${N(a)} to finish.` }];
+  return { q: `If \`f(x) = ${f}\`, for what value of x does \`f(x) = ${T}\`?`, big: [], choices: mc({ m: ns(x0) }, cands, numFb(x0, v => ({ m: ns(v), why: `Check: \`f(${ns(v)}) = ${ns(a * v + b)}\`, not ${N(T)}.` }))),
+    hint: `This time ${N(T)} is the output. Set the rule equal to ${N(T)} and solve.`,
+    steps: [['Set the rule equal to the output.', `${f} = ${T}`], [`${b > 0 ? 'Subtract' : 'Add'} ${Math.abs(b)} on both sides.`, { t: 'bal', L: [[a, 'x'], [b, '']], R: [[T, '']], op: [-b, ''] }], a !== 1 ? [`Divide both sides by ${N(a)}.`, { t: 'bal', L: [[a, 'x']], R: [[T - b, '']], div: a }] : null, [`Check: \`f(${x0}) = ${linSub(a, b, x0)} = ${T}\` ✓`, null]].filter(Boolean),
+    spec: { type: 'inverse', f, T } };
+}
+
+const STORIES = [
+  { mk: () => { const r = pick([20, 25, 30, 35]), f = pick([30, 40, 50]); return { r, f, eq: `C = ${r}h + ${f}`, setup: `A tutoring service uses \`C = ${r}h + ${f}\` to find the cost C, in dollars, of h hours of tutoring.`,
+      rate: `Each hour of tutoring costs ${money(r)}.`, fixed: `There is a ${money(f)} charge before any hours.`, rateW: [`The total cost of 1 hour is ${money(r)}.`, `A student gets ${r} hours of tutoring.`], fixedW: [`The total cost of tutoring is ${money(f)}.`, `Tutoring costs ${money(f)} per hour.`] }; } },
+  { mk: () => { const r = pick([10, 15, 20, 25]), f = pick([60, 100, 120, 150]); return { r, f, eq: `S = ${r}w + ${f}`, setup: `Marcus's savings after w weeks are \`S = ${r}w + ${f}\` dollars.`,
+      rate: `He adds ${money(r)} to his savings each week.`, fixed: `He had ${money(f)} saved when he started.`, rateW: [`He saves for ${r} weeks.`, `He has ${money(r)} after 1 week.`], fixedW: [`He adds ${money(f)} each week.`, `He wants to save ${money(f)} in all.`] }; } },
+  { mk: () => { const r = pick([2, 3, 4]), f = pick([24, 30, 36]); return { r, f, eq: `H = ${f} - ${r}t`, setup: `A candle's height after burning for t hours is \`H = ${f} - ${r}t\` centimeters.`, neg: true,
+      rate: `The candle gets ${r} cm shorter each hour.`, fixed: `The candle was ${f} cm tall before it was lit.`, rateW: [`The candle burns for ${r} hours.`, `The candle is ${r} cm tall when it burns out.`], fixedW: [`The candle burns for ${f} hours.`, `The candle gets ${f} cm shorter each hour.`] }; } },
+  { mk: () => { const r = pick([1.5, 2, 2.5]), f = pick([3, 4, 6]); return { r, f, eq: `H = ${ns(r)}w + ${f}`, setup: `A plant's height after w weeks is \`H = ${ns(r)}w + ${f}\` inches.`,
+      rate: `The plant grows ${ns(r)} inches each week.`, fixed: `The plant was ${f} inches tall at the start.`, rateW: [`The plant is ${ns(r)} inches tall at the start.`, `The plant grows for ${ns(r)} weeks.`], fixedW: [`The plant grows ${f} inches each week.`, `The plant stops growing at ${f} inches.`] }; } }
+];
+
+function s4b() {
+  const r0 = Math.random();
+  if (r0 < 0.4) {
+    const m = pick([Fr(1), Fr(2), Fr(3), Fr(-1), Fr(-2), Fr(-3), Fr(4), Fr(1, 2), Fr(-1, 2), Fr(2, 3), Fr(-2, 3), Fr(3, 2), Fr(-3, 2), Fr(1, 3)]);
+    let x1, y1, dx, dy, x2, y2; do { x1 = rint(-5, 5); y1 = rint(-6, 6); dx = m.d * rint(1, 3) * (chance(0.8) ? 1 : -1); dy = dx * m.n / m.d; x2 = x1 + dx; y2 = y1 + dy; } while (Math.abs(x2) > 9 || Math.abs(y2) > 12);
+    const cands = [{ m: frStr(Fr(-m.n, m.d)), why: `Check the signs. ${(y2 - y1) * (x2 - x1) > 0 ? 'Both changes have the same sign, so the slope is positive.' : 'The changes have opposite signs, so the slope is negative.'}` },
+      Math.abs(m.n) !== m.d ? { m: frStr(Fr(m.d * Math.sign(m.n), Math.abs(m.n))), why: 'Upside down. Slope is rise over run: the change in y goes on top.' } : null,
+      dy !== frVal(m) ? { m: ns(dy), why: `That's only the rise (the change in y). Divide it by the run, ${N(dx)}.` } : null];
+    return { q: `What is the slope of the line through \`${P2(x1, y1)}\` and \`${P2(x2, y2)}\`?`, big: [], choices: mc({ m: frStr(m) }, cands, i => i < 8 ? { m: frStr(Fr(m.n + (i + 1) * m.d * (i % 2 ? -1 : 1), m.d)), why: 'Slope = (change in y) ÷ (change in x).' } : null),
+      hint: 'Slope = (change in y) ÷ (change in x). Subtract in the same order on top and bottom.',
+      steps: [['Rise over run: subtract the y-values, then the x-values, in the same order.', `{${ns(y2)} - ${y1 < 0 ? `(${ns(y1)})` : ns(y1)}/${ns(x2)} - ${x1 < 0 ? `(${ns(x1)})` : ns(x1)}} = {${ns(dy)}/${ns(dx)}}`], ['Simplify.', `m = ${frStr(m)}`]],
+      spec: { type: 'num', fn: 'slope', p: { x1, y1, x2, y2 } } };
+  }
+  if (r0 < 0.7) {
+    const a = nz(-5, 6), b = pick([2, 3, 4, 5, -2, -3]), c = b * nz(-5, 6) * (chance(0.6) ? 1 : a), eq = `${lin([[a, 'x'], [b, 'y']])} = ${c}`;
+    if (chance(0.55)) {
+      const ans = Fr(c, b);
+      const cands = [a !== 0 ? { m: frStr(Fr(c, a)), why: `That's the x-intercept (where y = 0). The y-intercept is where \`x = 0\`.` } : null, { m: ns(c), why: `Set \`x = 0\`, then divide by ${N(b)}.` }, { m: frStr(Fr(-c, b)), why: 'Recheck the sign when you divide.' }];
+      return { q: `What is the y-intercept of the line \`${eq}\`?`, big: [], choices: mc({ m: frStr(ans) }, cands, i => i < 8 ? { m: frStr(Fr(c + (i + 1) * b * (i % 2 ? -1 : 1), b)), why: 'Set x = 0 and solve for y.' } : null),
+        hint: 'The y-intercept is where the line crosses the y-axis, so `x = 0` there.', steps: [['Set `x = 0`.', `${lin([[b, 'y']])} = ${c}`], [`Divide by ${N(b)}.`, `y = ${frStr(ans)}`]], spec: { type: 'num', fn: 'yint', p: { a, b, c } } };
+    }
+    const ans = Fr(-a, b);
+    const cands = [{ m: frStr(Fr(a, b)), why: `When you move \`${lin([[a, 'x']])}\` to the other side, its sign flips.` }, frEq(Fr(-b, a), ans) ? null : { m: frStr(Fr(-b, a)), why: 'Upside down. Solve for y and read the coefficient of x.' }, { m: ns(a), why: `Solve for y first. You have to divide by ${N(b)}.` }];
+    return { q: `What is the slope of the line \`${eq}\`?`, big: [], choices: mc({ m: frStr(ans) }, cands, i => i < 8 ? { m: frStr(Fr(-a + (i + 1) * (i % 2 ? -1 : 1), b)), why: 'Solve for y and read the coefficient of x.' } : null),
+      hint: 'Solve for y so it looks like `y = mx + b`. The slope is m.', steps: [[`Move the x-term: ${a > 0 ? 'subtract' : 'add'} \`${lin([[Math.abs(a), 'x']])}\`.`, `${lin([[b, 'y']])} = ${lin([[-a, 'x'], [c, '']])}`], [`Divide every term by ${N(b)}.`, `y = ${lin([[ans, 'x'], [Fr(c, b), '']])}`], ['The slope is the coefficient of x.', `m = ${frStr(ans)}`]],
+      spec: { type: 'num', fn: 'slopeStd', p: { a, b } } };
+  }
+  const S = pick(STORIES).mk(), askRate = chance(0.55);
+  const correct = askRate ? S.rate : S.fixed, wrong = askRate ? [S.fixed, ...S.rateW] : [S.rate, ...S.fixedW];
+  const num = askRate ? S.r : S.f;
+  const explain = askRate ? `${ns(num)} is the number multiplied by the variable. It's the rate: how much changes for each one unit.` : `${ns(num)} is the number that stands alone. It's the starting amount, before the variable does anything.`;
+  return { q: `${S.setup} What does the ${ns(num)} represent?`, big: [], choices: mc({ t: correct }, wrong.map(t => ({ t, why: explain })), () => null),
+    hint: 'In `y = mx + b`, m (the number with the variable) is the rate of change. b (the number alone) is the starting value.',
+    steps: [[explain, null], [correct, null]], spec: { type: 'text' } };
+}
+
+function s4c() {
+  const r0 = Math.random();
+  if (r0 < 0.35) {
+    const k = rint(1, 6), kind = pick(['up', 'down', 'right', 'left']);
+    const g = kind === 'up' ? `f(x) + ${k}` : kind === 'down' ? `f(x) - ${k}` : kind === 'right' ? `f(x - ${k})` : `f(x + ${k})`;
+    const L = { up: `Up ${k}`, down: `Down ${k}`, left: `Left ${k}`, right: `Right ${k}` }, U = d => `${L[d]} unit${k > 1 ? 's' : ''}`;
+    const rule = { up: `Adding ${k} outside the f moves every point up ${k}.`, down: `Subtracting ${k} outside the f moves every point down ${k}.`, right: `A change <b>inside</b> the parentheses works backward: \`x - ${k}\` moves the graph right ${k}.`, left: `A change <b>inside</b> the parentheses works backward: \`x + ${k}\` moves the graph left ${k}.` }[kind];
+    const cands = ['up', 'down', 'left', 'right'].filter(d => d !== kind).map(d => ({ t: U(d), why: rule }));
+    return { q: `How does the graph of \`g(x) = ${g}\` compare to the graph of \`f(x)\`?`, big: [], choices: mc({ t: U(kind) }, cands, () => null),
+      hint: 'Outside the f(…) moves the graph up or down, matching the sign. Inside the parentheses moves it left or right, opposite the sign.', steps: [[rule, null]], spec: { type: 'text' } };
+  }
+  if (r0 < 0.6) {
+    const a = pick([1, 1, 2, -1, 3, -2]), h = rint(-6, 6), k = rint(-6, 6);
+    const inside = h === 0 ? 'x' : `(x ${h > 0 ? '-' : '+'} ${Math.abs(h)})`;
+    const eq = `y = ${a === 1 ? '' : a === -1 ? '-' : a}${inside}^2${k ? ' ' + pm(k) : ''}`;
+    const cands = [h !== 0 ? { m: P2(-h, k), why: `Inside the parentheses works backward. \`${inside}\` means the vertex x-value is ${N(h)}.` } : null, k !== 0 ? { m: P2(h, -k), why: `The number outside the parentheses keeps its sign. \`${pm(k)}\` means the vertex y-value is ${N(k)}.` } : null,
+      h !== k ? { m: P2(k, h), why: 'Order: the x-value of the vertex comes from inside the parentheses.' } : null, h !== 0 || k !== 0 ? { m: P2(-h, -k), why: 'Inside the parentheses flips the sign, outside does not.' } : null];
+    const fb = i => { const o = [[1, 0], [0, 1], [-1, 0], [0, -1], [a, 0], [1, 1]][i]; return o ? { m: P2(h + o[0], k + o[1]), why: 'The vertex form is `y = a(x - h)^2 + k`, with vertex (h, k).' } : null; };
+    return { q: 'What is the vertex of this parabola?', big: [eq], choices: mc({ m: P2(h, k) }, cands, fb),
+      hint: 'In `y = a(x - h)^2 + k`, the vertex is (h, k). The h flips sign, the k doesn’t.',
+      steps: [['Vertex form is `y = a(x - h)^2 + k`, with vertex (h, k).', null], [`Inside: \`${inside}\` means h = ${N(h)}. Outside: ${k ? `\`${pm(k)}\` means k = ${N(k)}` : 'nothing, so k = 0'}.`, `vertex = ${P2(h, k)}`]],
+      spec: { type: 'vertex', eq } };
+  }
+  if (r0 < 0.82) {
+    const m = nz(-4, 5), b = rint(-6, 6), s = rint(2, 7), up = chance(0.5), nb = up ? b + s : b - s;
+    const orig = `y = ${lin([[m, 'x'], [b, '']])}`, ans = `y = ${lin([[m, 'x'], [nb, '']])}`;
+    const cands = [{ m: `y = ${lin([[m, 'x'], [up ? b - s : b + s, '']])}`, why: `Moving ${up ? 'up' : 'down'} means you ${up ? 'add' : 'subtract'} ${s} to the whole right side.` },
+      { m: `y = ${lin([[up ? m + s : m - s, 'x'], [b, '']])}`, why: `Changing the slope tilts the line. A shift ${up ? 'up' : 'down'} only changes the y-intercept.` },
+      { m: `y = ${lin([[m, 'x'], [up ? s : -s, '']])}`, why: `You replaced the intercept. Add ${up ? s : -s} to the old intercept, ${N(b)}, instead.` }];
+    return { q: `The line \`${orig}\` is shifted ${up ? 'up' : 'down'} ${s} units. What is the equation of the new line?`, big: [], choices: mc({ m: ans }, cands, i => i < 6 ? { m: `y = ${lin([[m, 'x'], [nb + (i + 1) * (i % 2 ? -1 : 1), '']])}`, why: `Recheck: ${N(b)} ${up ? '+' : '−'} ${s}.` } : null),
+      hint: 'A vertical shift only changes the y-intercept. The slope stays the same.',
+      steps: [[`Shifting ${up ? 'up' : 'down'} ${s} ${up ? 'adds' : 'subtracts'} ${s} to every y-value. Only the intercept changes.`, `${ns(b)} ${up ? '+' : '-'} ${s} = ${ns(nb)}`], ['Same slope, new intercept.', ans]],
+      spec: { type: 'shiftLine', orig, dy: up ? s : -s } };
+  }
+  let h = nz(-5, 5), k = nz(-5, 5); if (Math.abs(h) === Math.abs(k)) k = k > 0 ? k + 1 : k - 1;
+  const desc = `${h > 0 ? 'right' : 'left'} ${Math.abs(h)} and ${k > 0 ? 'up' : 'down'} ${Math.abs(k)}`;
+  const V = (hh, kk) => `y = (x ${hh > 0 ? '-' : '+'} ${Math.abs(hh)})^2 ${pm(kk)}`;
+  const cands = [{ m: V(-h, k), why: `Inside the parentheses works backward: ${h > 0 ? 'right' : 'left'} ${Math.abs(h)} is \`x ${h > 0 ? '-' : '+'} ${Math.abs(h)}\`.` },
+    { m: V(h, -k), why: `Up and down match the sign: ${k > 0 ? 'up' : 'down'} ${Math.abs(k)} is \`${pm(k)}\` outside.` }, { m: V(k, h), why: 'The left/right number goes inside the parentheses. The up/down number goes outside.' }, { m: V(-h, -k), why: 'Inside flips the sign, outside does not.' }];
+  return { q: `The graph of \`y = x^2\` is shifted ${desc}. What is the new equation?`, big: [], choices: mc({ m: V(h, k) }, cands, () => null),
+    hint: 'Left/right goes inside the parentheses with the opposite sign. Up/down goes outside with the same sign.',
+    steps: [[`${cap(h > 0 ? 'right' : 'left')} ${Math.abs(h)} goes inside, sign flipped. ${cap(k > 0 ? 'up' : 'down')} ${Math.abs(k)} goes outside, same sign.`, V(h, k)]],
+    spec: { type: 'vertex', eq: V(h, k), expect: [h, k], lead: 1 } };
+}
+
+function s4d() {
+  const r0 = Math.random();
+  if (r0 < 0.65) {
+    const m = pick([Fr(1), Fr(2), Fr(3), Fr(-1), Fr(-2), Fr(-3), Fr(1, 2), Fr(-1, 2), Fr(1, 3), Fr(-1, 3), Fr(2, 3), Fr(-2, 3)]);
+    let b, run, x2, y2; do { b = rint(-4, 4); run = m.d === 1 ? rint(1, 2) : m.d; x2 = run; y2 = b + frVal(m) * run; } while (Math.abs(y2) > 6);
+    const pts = [[0, b], [x2, y2]], fig = { kind: 'line', m: frVal(m), b, pts };
+    if (r0 < 0.45) {
+      const ans = `y = ${lin([[m, 'x'], [b, '']])}`;
+      const cands = [{ m: `y = ${lin([[Fr(-m.n, m.d), 'x'], [b, '']])}`, why: `The line goes ${m.n > 0 ? 'up' : 'down'} from left to right, so the slope is ${m.n > 0 ? 'positive' : 'negative'}.` },
+        b !== 0 ? { m: `y = ${lin([[m, 'x'], [-b, '']])}`, why: `The line crosses the y-axis at ${N(b)}, so the intercept is ${N(b)}.` } : null,
+        Math.abs(m.n) !== m.d ? { m: `y = ${lin([[Fr(m.d * Math.sign(m.n), Math.abs(m.n)), 'x'], [b, '']])}`, why: 'Upside down. Slope is rise over run: vertical change on top.' } : null,
+        { m: `y = ${lin([[Fr(b), 'x'], [frVal(m) * 1 === Math.round(frVal(m)) ? Fr(m.n) : m, '']])}`, why: 'Swapped. The slope multiplies x; the y-intercept stands alone.' }];
+      return { q: 'Which equation matches the line on the graph?', big: [], fig, choices: mc({ m: ans }, cands, i => i < 6 ? { m: `y = ${lin([[m, 'x'], [b + (i + 1) * (i % 2 ? -1 : 1), '']])}`, why: `Find where the line crosses the y-axis: at ${N(b)}.` } : null),
+        hint: 'Find where the line crosses the y-axis (that’s b). Then count rise over run between two dots (that’s m).',
+        steps: [[`The line crosses the y-axis at \`${P2(0, b)}\`, so b = ${N(b)}.`, null], [`From \`${P2(0, b)}\` to \`${P2(x2, y2)}\`: rise ${N(y2 - b)}, run ${N(x2)}.`, x2 === 1 || (frEq(Fr(y2 - b, x2), m) && m.d === x2) ? `m = ${frStr(m)}` : `m = {${ns(y2 - b)}/${ns(x2)}} = ${frStr(m)}`], ['Put it together.', ans]],
+        spec: { type: 'line', pts } };
+    }
+    const cands = [{ m: frStr(Fr(-m.n, m.d)), why: `The line goes ${m.n > 0 ? 'up' : 'down'} from left to right, so the slope is ${m.n > 0 ? 'positive' : 'negative'}.` }, Math.abs(m.n) !== m.d ? { m: frStr(Fr(m.d * Math.sign(m.n), Math.abs(m.n))), why: 'Upside down. Slope is rise over run: vertical change on top.' } : null, !frEq(Fr(b), m) ? { m: ns(b), why: `${N(b)} is the y-intercept, where the line crosses the y-axis. Slope is rise over run.` } : null];
+    return { q: 'What is the slope of the line on the graph?', big: [], fig, choices: mc({ m: frStr(m) }, cands, i => i < 8 ? { m: frStr(Fr(m.n + (i + 1) * m.d * (i % 2 ? -1 : 1), m.d)), why: 'Count rise over run between the two dots.' } : null),
+      hint: 'Pick the two dots. Count how far up or down (rise), then how far right (run).', steps: [[`From \`${P2(0, b)}\` to \`${P2(x2, y2)}\`: rise ${N(y2 - b)}, run ${N(x2)}.`, x2 === 1 || m.d === x2 ? `m = ${frStr(m)}` : `m = {${ns(y2 - b)}/${ns(x2)}} = ${frStr(m)}`]],
+      spec: { type: 'num', fn: 'slope', p: { x1: 0, y1: b, x2, y2 } } };
+  }
+  const m = pick([2, 3, 4, 5, -2, -3]), b = nz(-5, 6), xs = [1, 2, 3, 4], ys = xs.map(x => m * x + b);
+  const ans = `y = ${lin([[m, 'x'], [b, '']])}`;
+  const cands = [{ m: `y = ${lin([[m, 'x'], [ys[0], '']])}`, why: `${N(ys[0])} is the output when \`x = 1\`, not when \`x = 0\`. Step back once: ${N(ys[0])} ${m > 0 ? '−' : '+'} ${Math.abs(m)} = ${N(b)}.` },
+    b !== m ? { m: `y = ${lin([[b, 'x'], [m, '']])}`, why: 'Swapped. The amount y changes each step is the slope, and it multiplies x.' } : null,
+    { m: `y = ${lin([[-m, 'x'], [b, '']])}`, why: `y ${m > 0 ? 'goes up' : 'goes down'} as x goes up, so the slope is ${m > 0 ? 'positive' : 'negative'}.` }];
+  return { q: 'Which equation matches the table?', big: [], fig: { kind: 'table', xs, ys }, choices: mc({ m: ans }, cands, i => i < 6 ? { m: `y = ${lin([[m, 'x'], [b + (i + 1) * (i % 2 ? -1 : 1), '']])}`, why: 'Check one row: plug its x in and see if you get its y.' } : null),
+    hint: 'How much does y change each time x goes up by 1? That’s the slope. Then work back to x = 0 to find b.',
+    steps: [[`Each time x goes up 1, y changes by ${N(m)}. That's the slope.`, `m = ${m}`], [`Step back from \`x = 1\` to \`x = 0\`: ${N(ys[0])} ${m > 0 ? '−' : '+'} ${Math.abs(m)} = ${N(b)}.`, `b = ${b}`], ['Put it together and check a row.', `${ans}`]],
+    spec: { type: 'line', pts: xs.map((x, i) => [x, ys[i]]) } };
+}
+
+/* ---------- registry ---------- */
+const SKILLS = {
+  s1a: { mod: 1, name: 'Two-step equations', gen: s1a },
+  s1b: { mod: 1, name: 'Distribute & both sides', gen: s1b },
+  s1c: { mod: 1, name: 'Solve for a letter', gen: s1c },
+  s1d: { mod: 1, name: 'Systems: where lines meet', gen: s1d },
+  s2a: { mod: 2, name: 'Words into math', gen: s2a },
+  s2b: { mod: 2, name: 'Write the equation', gen: s2b },
+  s2c: { mod: 2, name: 'Solve the story', gen: s2c },
+  s2d: { mod: 2, name: 'Distance = rate × time', gen: s2d },
+  s3a: { mod: 3, name: 'Percent of a number', gen: s3a },
+  s3b: { mod: 3, name: 'Discounts, tax & change', gen: s3b },
+  s3c: { mod: 3, name: 'Ratios & proportions', gen: s3c },
+  s3d: { mod: 3, name: 'Unit rates & mixtures', gen: s3d },
+  s4a: { mod: 4, name: 'Evaluate f(x)', gen: s4a },
+  s4b: { mod: 4, name: 'Slope & intercept', gen: s4b },
+  s4c: { mod: 4, name: 'Graph shifts', gen: s4c },
+  s4d: { mod: 4, name: 'Match graph or table', gen: s4d }
+};
+function generate(id) { const p = SKILLS[id].gen(); p.skill = id; return p; }
+
+/* ---------- math rendering ---------- */
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+function mathInner(s) {
+  let out = '', prev = 'start';
+  for (let i = 0; i < s.length;) {
+    const c = s[i];
+    if (c === ' ') { i++; continue; }
+    if (c === '{') {
+      let d = 1, j = i + 1; while (j < s.length && d) { if (s[j] === '{') d++; else if (s[j] === '}') d--; j++; }
+      const inner = s.slice(i + 1, j - 1); let dd = 0, k = -1;
+      for (let t = 0; t < inner.length; t++) { const ch = inner[t]; if (ch === '{' || ch === '(') dd++; else if (ch === '}' || ch === ')') dd--; else if (ch === '/' && dd === 0) { k = t; break; } }
+      out += k < 0 ? mathInner(inner) : `<span class="fr"><span class="nu">${mathInner(inner.slice(0, k))}</span><span class="de">${mathInner(inner.slice(k + 1))}</span></span>`;
+      prev = 'num'; i = j; continue;
+    }
+    if (/[0-9.]/.test(c)) { let j = i; while (j < s.length && /[0-9.]/.test(s[j])) j++; out += s.slice(i, j); prev = 'num'; i = j; continue; }
+    if (/[a-zA-Z]/.test(c)) { out += `<i>${c}</i>`; prev = 'var'; i++; continue; }
+    if (c === '-' || c === '−') { const un = prev === 'start' || prev === 'op' || prev === 'open'; out += un ? '−' : ' − '; prev = 'op'; i++; continue; }
+    if (c === '+' || c === '=') { out += ` ${c} `; prev = 'op'; i++; continue; }
+    if (c === '*') { out += ' · '; prev = 'op'; i++; continue; }
+    if (c === '÷') { out += ' ÷ '; prev = 'op'; i++; continue; }
+    if (c === '^') { let j = i + 1, e = ''; while (j < s.length && /[0-9a-z]/.test(s[j])) { e += s[j]; j++; } out += `<sup>${mathInner(e)}</sup>`; prev = 'num'; i = j; continue; }
+    if (c === '(') { out += '('; prev = 'open'; i++; continue; }
+    if (c === ')') { out += ')'; prev = 'num'; i++; continue; }
+    if (c === ',') { out += ', '; prev = 'open'; i++; continue; }
+    if (c === '✓') { out += ' <span class="tick">✓</span>'; i++; continue; }
+    out += esc(c); prev = c === '$' ? 'open' : 'num'; i++;
+  }
+  return out;
+}
+const renderMath = s => `<span class="m">${mathInner(String(s))}</span>`;
+function renderProse(s) { return String(s).split('`').map((seg, i) => i % 2 ? renderMath(seg) : seg).join(''); }
+
+const api = { SKILLS, generate, renderMath, renderProse, renderWork, workEqs, ladderInfo, pctLadder, wholeLadder, hundredSteps, Fr, lin };
+if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.TSI = api;
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+/* TSI Bootcamp app: lessons, practice, mixed review */
+(function () {
+'use strict';
+const E = window.TSI, Rp = E.renderProse, Rm = E.renderMath;
+const LET = 'ABCD';
+const fmtN = v => (v < 0 ? '−' + (-v) : String(v));
+
+/* ---------- saved progress (this browser only) ---------- */
+const KEY = 'tsi-bootcamp-v1';
+function load() { try { const v = JSON.parse(localStorage.getItem(KEY) || 'null'); if (v && typeof v === 'object') return v; } catch (e) { /* storage blocked */ } return {}; }
+const saved = Object.assign({ st: {}, big: false }, load());
+function save() { try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) { /* storage blocked */ } }
+const stat = sid => saved.st[sid] || (saved.st[sid] = { t: 0, r: 0, s: 0, d: false });
+const isDone = sid => !!(saved.st[sid] && saved.st[sid].d);
+
+/* ---------- lesson content ---------- */
+const MODS = [
+  { n: 1, title: 'Linear Equations & Systems', short: 'Equations', mins: 45, at: '0:10–0:55', skills: ['s1a', 's1b', 's1c', 's1d'],
+    why: 'This is the most-tested idea on the TSI math section, and almost every word problem turns into one of these equations.',
+    moves: [
+      { t: 'Undo in reverse order', rule: 'To get x alone, undo what was done to it, backward: undo adding or subtracting first, then undo multiplying or dividing.',
+        ex: [{ q: 'Solve `4x - 7 = 13`.', steps: [['Undo the − 7: add 7 to both sides. Write the +7 under each side, draw a line, and combine.', { t: 'bal', L: [[4, 'x'], [-7, '']], R: [[13, '']], op: [7, ''] }], ['Undo the × 4: divide every term on both sides by 4.', { t: 'bal', L: [[4, 'x']], R: [[20, '']], div: 4 }], ['Check: put 5 back in.', '4(5) - 7 = 13 ✓']] }],
+        watch: 'Undo the + or − before you divide. If you divide first, you have to divide <b>every</b> term.' },
+      { t: 'Distribute, then collect', rule: 'Clear the parentheses first. Then move all the x-terms to one side and the plain numbers to the other.',
+        ex: [{ q: 'Solve `3(x - 4) = x + 6`.', steps: [['Distribute: the 3 multiplies <b>both</b> terms inside. Follow the arrows.', { t: 'dist', a: 3, inner: [[1, 'x'], [-4, '']], R: [[1, 'x'], [6, '']] }], ['Subtract `x` from both sides.', { t: 'bal', L: [[3, 'x'], [-12, '']], R: [[1, 'x'], [6, '']], op: [-1, 'x'] }], ['Add 12 to both sides.', { t: 'bal', L: [[2, 'x'], [-12, '']], R: [[6, '']], op: [12, ''] }], ['Divide both sides by 2.', { t: 'bal', L: [[2, 'x']], R: [[18, '']], div: 2 }], ['Check: left side `3(9 - 4) = 15`, right side `9 + 6 = 15` ✓', null]] }],
+        watch: 'The 3 multiplies <b>both</b> terms: `3(x - 4)` is `3x - 12`, not `3x - 4`.' },
+      { t: 'Solve for a letter', rule: 'Solving a formula for one letter works the same way. Treat the other letters like numbers.',
+        ex: [{ q: 'Solve `2x + 3y = 12` for `y`.', steps: [['Subtract `2x` from both sides.', { t: 'bal', L: [[2, 'x'], [3, 'y']], R: [[12, '']], op: [-2, 'x'] }], ['Divide <b>every</b> term by 3, including the 12.', { t: 'bal', L: [[3, 'y']], R: [[-2, 'x'], [12, '']], div: 3 }]] }],
+        watch: 'Divide every term, including the 12. A common wrong answer leaves it as 12.' },
+      { t: 'Systems: where two lines meet', rule: 'The solution to a system is the one point that works in both equations. On a graph, it is where the two lines cross.', fig: 'system',
+        ex: [{ q: 'Solve `y = 2x + 1` and `y = -x + 7`.', steps: [['Both equal y, so set the right sides equal.', '2x + 1 = -x + 7'], ['Add `x` to both sides.', { t: 'bal', L: [[2, 'x'], [1, '']], R: [[-1, 'x'], [7, '']], op: [1, 'x'] }], ['Subtract 1 from both sides.', { t: 'bal', L: [[3, 'x'], [1, '']], R: [[7, '']], op: [-1, ''] }], ['Divide both sides by 3.', { t: 'bal', L: [[3, 'x']], R: [[6, '']], div: 3 }], ['Plug x back in to find y.', 'y = 2(2) + 1 = 5'], ['The lines meet at `(2, 5)`. Check the other equation: `-2 + 7 = 5` ✓', null]] },
+          { q: 'Solve `x + y = 10` and `x - y = 4`.', steps: [['Stack the equations and add them. The y-terms are opposites, so they cancel.', { t: 'stack', e1: { L: [[1, 'x'], [1, 'y']], R: [[10, '']] }, e2: { L: [[1, 'x'], [-1, 'y']], R: [[4, '']] }, op: '+' }], ['Divide both sides by 2.', { t: 'bal', L: [[2, 'x']], R: [[14, '']], div: 2 }], ['Plug `x = 7` into `x + y = 10`.', '7 + y = 10'], ['Subtract 7 from both sides. The solution is `(7, 3)`.', { t: 'bal', L: [[7, ''], [1, 'y']], R: [[10, '']], op: [-7, ''], keysL: ['c', 'y'] }]] }],
+        watch: 'How many solutions? Different slopes: exactly one. Same slope with different intercepts: none, because the lines are parallel. Same line: infinitely many.' }],
+    tip: 'Plug in the choices. The right ordered pair works in <b>both</b> equations, so test each choice and cross out the ones that fail.' },
+  { n: 2, title: 'Word Problems into Equations', short: 'Word problems', mins: 35, at: '0:55–1:30', skills: ['s2a', 's2b', 's2c', 's2d'],
+    why: 'The TSI hides algebra inside stories about phone plans, gym memberships and road trips. Turn the words into an equation and you already know how to solve it.',
+    moves: [
+      { t: 'Translate piece by piece', rule: 'Read the sentence in chunks and turn each chunk into math.', words: true,
+        ex: [{ q: 'Write and solve: “5 less than twice a number is 17.”', steps: [['“Twice a number” is `2n`.', '2n'], ['“5 less than” that takes 5 away from it.', '2n - 5'], ['“Is 17” finishes the equation.', '2n - 5 = 17'], ['Add 5 to both sides.', { t: 'bal', L: [[2, 'n'], [-5, '']], R: [[17, '']], op: [5, ''] }], ['Divide both sides by 2.', { t: 'bal', L: [[2, 'n']], R: [[22, '']], div: 2 }]] }],
+        watch: '“Less than” flips the order. “5 less than x” is `x - 5`, not `5 - x`.' },
+      { t: 'Start + rate × count', rule: 'Most TSI story equations have a one-time amount and an amount that repeats. The repeating amount gets multiplied by the variable.',
+        ex: [{ q: 'A gym charges a $30 sign-up fee plus $20 per month. Write the total cost C after m months.', steps: [['The one-time $30 stands alone.', '30'], ['The $20 repeats every month, so multiply it by m.', '20m'], ['Put them together.', 'C = 20m + 30'], ['Test it: 2 months should cost $30 + $40 = $70.', 'C = 20(2) + 30 = 70 ✓']] }],
+        watch: 'Don’t multiply the one-time fee by the variable. `C = 20(m + 30)` would charge the fee every month.' },
+      { t: 'Answer the question asked', rule: 'Write the equation, solve it, then reread the question. Wrong choices are often the right number for a different question.',
+        ex: [{ q: 'Same gym. You have paid $190 in total. How many months?', steps: [['Set the cost equal to 190.', '20m + 30 = 190'], ['Subtract the $30 fee from both sides.', { t: 'bal', L: [[20, 'm'], [30, '']], R: [[190, '']], op: [-30, ''] }], ['Divide both sides by 20.', { t: 'bal', L: [[20, 'm']], R: [[160, '']], div: 20 }]] },
+          { q: 'Gym A costs $30 plus $20 per month. Gym B costs $70 plus $15 per month. When do they cost the same?', steps: [['Set the two totals equal.', '20m + 30 = 15m + 70'], ['Subtract `15m` from both sides.', { t: 'bal', L: [[20, 'm'], [30, '']], R: [[15, 'm'], [70, '']], op: [-15, 'm'] }], ['Subtract 30 from both sides.', { t: 'bal', L: [[5, 'm'], [30, '']], R: [[70, '']], op: [-30, ''] }], ['Divide both sides by 5.', { t: 'bal', L: [[5, 'm']], R: [[40, '']], div: 5 }], ['Check: Gym A costs $190, and Gym B costs $70 + $120 = $190 ✓', null]] }],
+        watch: 'If the choices include both 160 and 8, ask yourself whether the question wants dollars or months.' },
+      { t: 'Distance = rate × time', rule: 'Use `d = rt`. When two things move at the same time, combine their speeds.',
+        ex: [{ q: 'Two cars start 280 miles apart and drive toward each other at 60 mph and 80 mph. How long until they meet?', steps: [['Toward each other, the gap shrinks by 60 + 80 = 140 miles every hour.', '140t = 280'], ['Divide by 140. They meet after 2 hours.', 't = 2']] }],
+        watch: 'Toward each other or in opposite directions: add the speeds. One catching up to the other: subtract them.' }],
+    tip: 'Underline the question before you start. When you finish, check that your answer is in the units it asked for.' },
+  { n: 3, title: 'Percents & Proportions', short: 'Percents', mins: 35, at: '1:40–2:15', skills: ['s3a', 's3b', 's3c', 's3d'],
+    why: 'Percent and ratio questions are guaranteed to show up under quantitative reasoning, and they are some of the easiest points to lock in.',
+    moves: [
+      { t: 'The 10% method', pieces: true, rule: 'You never have to multiply by a percent. Move the decimal point one place left to get 10%. Half of that is 5%. Move it two places left to get 1%. Then build the percent you need out of those pieces, using small numbers only.',
+        ex: [{ q: 'What is 35% of 80?', steps: [['Find the easy pieces, then build 35% from them: 35% is three 10%s and one 5%.', { t: 'ladder', rows: [[100, 80, 'the whole'], [10, 8, 'move the decimal point one place left'], [5, 4, 'half of 10%']], build: { target: 35, terms: [[3, 10], [1, 5]] } }]] },
+          { q: '18 is what percent of 72?', steps: [['Write the part over the whole.', '{18/72}'], ['Simplify: divide the top and bottom by 18.', '{18/72} = {1/4}'], ['Make the bottom 100: multiply the top and bottom by 25.', '{1/4} = {25/100}'], ['“Out of 100” is a percent. The answer is 25%.', '{25/100} = 25%']] },
+          { q: '15 is 30% of what number?', steps: [['You know 30% of the number is 15. Work down to 10%, then up to 100%.', { t: 'ladder', rows: [[30, 15, 'what you know'], [10, 5, '÷ 3'], [100, 50, '× 10']] }]] }],
+        watch: 'One place left is 10%, two places left is 1%. A percent less than 100% of a number has to come out smaller than that number, so check the size of your answer.' },
+      { t: 'Discounts, tax, and percent change', rule: 'Find the dollar amount of the discount or the tax with the same pieces, then finish the story: subtract a discount, add tax. For percent change, put the change over the original price and make the bottom 100.',
+        ex: [{ q: 'A $60 jacket is 25% off. What is the sale price?', steps: [['Find the discount, 25% of $60: half of 60, then half again.', { t: 'ladder', rows: [[100, 60, 'the whole'], [50, 30, 'half of 100%'], [25, 15, 'half of 50%']], money: true }], ['Subtract the $15 discount from the price. The sale price is $45.', '60 - 15 = 45']] },
+          { q: 'Dallas sales tax is 8.25%. What do you pay for a $40 item?', steps: [['Find the tax, 8.25% of $40. Start with 1%, then build 8.25%.', { t: 'ladder', rows: [[100, 40, 'the whole'], [1, 0.4, 'move the decimal point <b>two</b> places left'], [0.25, 0.1, 'a quarter of 1% (divide by 4)']], build: { target: 8.25, terms: [[8, 1], [1, 0.25]] }, money: true }], ['Add the tax to the price. You pay $43.30.', '40 + 3.30 = 43.30']] },
+          { q: 'A price goes from $40 to $50. What is the percent increase?', steps: [['Find the change.', '50 - 40 = 10'], ['Write the change over the original price.', '{10/40}'], ['Simplify: divide the top and bottom by 10.', '{10/40} = {1/4}'], ['Make the bottom 100: multiply the top and bottom by 25.', '{1/4} = {25/100}'], ['That is a 25% increase.', '{25/100} = 25%']] },
+          { q: 'After 20% off, a shirt costs $32. What was the original price?', steps: [['You paid 100% − 20% = 80% of the original price, and that was $32.', null], ['Work down to 10%, then up to 100%. The original price was $40.', { t: 'ladder', rows: [[80, 32, 'what you know'], [10, 4, '÷ 8'], [100, 40, '× 10']], money: true }]] }],
+        watch: 'To undo a discount, don’t add 20% of $32 back on. That gives $38.40, which is wrong, because the 20% was taken from the original price.' },
+      { t: 'The butterfly method', rule: 'A proportion is two equal fractions. Set them up with the same units on top and the same units on the bottom. Multiply along each wing of the butterfly (the two diagonals), set the two products equal, then divide.',
+        ex: [{ q: 'A recipe uses 3 cups of flour for 4 dozen cookies. How much flour for 10 dozen?', steps: [['Cups on top, dozens on the bottom. Multiply along each wing.', { t: 'bf', a: '3', b: '4', c: 'x', d: '10' }], ['Divide both sides by 4. You need 7.5 cups.', { t: 'bal', L: [[4, 'x']], R: [[30, '']], div: 4, dec: true }]] },
+          { q: 'The ratio of boys to girls is 3:5. There are 40 students. How many are girls?', steps: [['3 + 5 = 8 equal shares. Find one share.', '40 ÷ 8 = 5'], ['Girls get 5 shares.', '5 * 5 = 25']] }],
+        watch: 'Each wing gives one product. Never multiply straight across the tops. And a ratio like 3:5 compares the parts to each other, so add the parts to get the total number of shares.' },
+      { t: 'Rates and mixtures', rule: 'A unit rate is the amount for one. For mixtures, track the actual amount of the ingredient, not just the percent.',
+        ex: [{ q: '12 cans cost $5.40. What is the price per can?', steps: [['Divide the price by the number of cans.', '5.40 ÷ 12 = 0.45'], ['That is $0.45 per can.', null]] },
+          { q: 'Mix 4 liters of 10% salt water with 6 liters of 20% salt water. What percent salt is the mix?', steps: [['Salt in the first part is 10% of 4 liters: move the decimal point one place left.', '4 ÷ 10 = 0.4'], ['Salt in the second part is 20% of 6 liters. 10% of 6 is 0.6, so 20% is twice that.', '2 * 0.6 = 1.2'], ['Total salt ÷ total liters.', '1.6 ÷ 10 = 0.16 = 16%']] }],
+        watch: 'You can’t just average 10% and 20% to get 15%. Averaging only works when the amounts are equal.' }],
+    tip: 'Estimate first. 25% off $60 has to be less than $60 and more than $30, which rules out choices before you work anything out.' },
+  { n: 4, title: 'Functions & Graph Behavior', short: 'Functions', mins: 35, at: '2:15–2:50', skills: ['s4a', 's4b', 's4c', 's4d'],
+    why: 'The TSI asks you to plug values into functions, read slopes and intercepts, and predict how changing an equation moves its graph.',
+    moves: [
+      { t: 'f(x) means “plug in”', rule: 'To find f(−2), replace every x with (−2), in parentheses. Then follow the order of operations.',
+        ex: [{ q: 'If `f(x) = 3x^2 - 2x + 1`, find `f(-2)`.', steps: [['Replace every x with (−2).', 'f(-2) = 3(-2)^2 - 2(-2) + 1'], ['Square first: `(-2)^2 = 4`.', '= 3(4) - 2(-2) + 1'], ['Multiply, then add.', '= 12 + 4 + 1 = 17']] }],
+        watch: '`(-2)^2` is 4, not −4. Use parentheses every time you plug in a negative number.' },
+      { t: 'Slope and intercept', rule: 'In `y = mx + b`, m is the slope (rise over run) and b is where the line crosses the y-axis. In a story, m is the rate and b is the starting amount.',
+        ex: [{ q: 'Find the slope of the line through `(1, 3)` and `(4, 12)`.', steps: [['Rise over run: change in y over change in x.', 'm = {12 - 3/4 - 1} = {9/3} = 3']] },
+          { q: 'Find the y-intercept of `2x + 3y = 12`.', steps: [['The y-intercept is where `x = 0`.', '3y = 12'], ['Divide by 3.', 'y = 4']] },
+          { q: 'A tutor uses `C = 15h + 40` to find the cost of h hours. What do 15 and 40 mean?', steps: [['15 is multiplied by h, so it is the rate: $15 for each hour.', null], ['40 stands alone, so it is the starting amount: a $40 fee before any hours.', null]] }],
+        watch: 'Rise goes on top. Subtract the y-values and the x-values in the same order.' },
+      { t: 'Shifts move the graph', rule: 'A number outside the parentheses moves the graph up or down. A number inside moves it left or right, opposite its sign.', fig: 'shift', rules: true,
+        ex: [{ q: 'What is the vertex of `y = (x - 4)^2 + 1`?', steps: [['Inside: `x - 4` means right 4.', 'h = 4'], ['Outside: `+ 1` means up 1.', 'k = 1'], ['The vertex is the point (h, k).', '(4, 1)']] }],
+        watch: '`f(x - 3)` moves the graph <b>right</b> 3, not left. Inside the parentheses works backward.' },
+      { t: 'Match a graph or a table', rule: 'Find b first: the y-value when x = 0. Then find the slope: how much y changes when x goes up by 1.',
+        ex: [{ q: 'Which equation fits this table?', tbl: { xs: [1, 2, 3, 4], ys: [5, 8, 11, 14] }, steps: [['y goes up 3 each time x goes up 1.', 'm = 3'], ['Step back from x = 1 to x = 0: 5 − 3 = 2.', 'b = 2'], ['Put it together.', 'y = 3x + 2'], ['Check a row: x = 3 gives `3(3) + 2 = 11` ✓', null]] }],
+        watch: '5 is the output when x = 1, so it is not the y-intercept. The intercept is the output when x = 0.' }],
+    tip: 'Check one point. Pick a point you can read exactly from the graph or table, plug it into each choice, and the wrong ones fail fast.' }
+];
+const AGENDA = [
+  { at: '0:00', title: 'Kickoff', note: 'How the test works and four habits that save points (this page).', mins: 10 },
+  { at: '0:10', mod: 1 }, { at: '0:55', mod: 2 },
+  { at: '1:30', title: 'Break', note: 'Stand up, get water.', mins: 10, brk: true },
+  { at: '1:40', mod: 3 }, { at: '2:15', mod: 4 },
+  { at: '2:50', title: 'Mixed review', note: 'Ten problems that mix all four modules.', mins: 10, go: 'mix' }
+];
+const HABITS = [
+  ['Plug in the choices', 'Every question is multiple choice. When you are stuck, put each answer back into the problem and see which one works.'],
+  ['Estimate first', 'Decide roughly how big the answer should be before you calculate. It rules out choices and catches decimal slips.'],
+  ['Underline the question', 'Many wrong choices are the right number for a different question, like the fee instead of the total.'],
+  ['Parentheses for negatives', 'When you plug in a negative number, wrap it in parentheses. `(-3)^2 = 9`, but `-3^2 = -9`.']
+];
+const WORDS = [['is, equals, gives', '='], ['more than, increased by, sum, plus', '+'], ['less than, decreased by, difference, minus', '−'], ['times, of, product, twice', '×'], ['per, divided by, quotient', '÷']];
+const RULES = [['f(x) + k', 'up k'], ['f(x) - k', 'down k'], ['f(x - h)', 'right h'], ['f(x + h)', 'left h'], ['-f(x)', 'flips upside down']];
+
+/* ---------- state ---------- */
+const S = { view: 'home', tab: {}, prac: {}, ex: {}, mix: null, arm: false, shift: { h: 2, k: 1 } };
+const app = document.getElementById('app');
+
+/* ---------- small pieces ---------- */
+function plot(o) {
+  const xr = o.xr || [-6, 6], yr = o.yr || [-6, 6], u = 24, W = (xr[1] - xr[0]) * u, H = (yr[1] - yr[0]) * u;
+  const sx = x => (x - xr[0]) * u, sy = y => (yr[1] - y) * u, id = 'clip' + Math.random().toString(36).slice(2, 8);
+  let g = `<rect class="bg" x="0" y="0" width="${W}" height="${H}"/>`;
+  for (let x = xr[0]; x <= xr[1]; x++) g += `<line class="gl${x === 0 ? ' ax' : ''}" x1="${sx(x)}" y1="0" x2="${sx(x)}" y2="${H}"/>`;
+  for (let y = yr[0]; y <= yr[1]; y++) g += `<line class="gl${y === 0 ? ' ax' : ''}" x1="0" y1="${sy(y)}" x2="${W}" y2="${sy(y)}"/>`;
+  let t = '';
+  if (yr[0] <= 0 && yr[1] >= 0) for (let x = xr[0] + 1; x < xr[1]; x++) if (x && x % 2 === 0) t += `<text class="tk" x="${sx(x)}" y="${sy(0) + 15}" text-anchor="middle">${fmtN(x)}</text>`;
+  if (xr[0] <= 0 && xr[1] >= 0) for (let y = yr[0] + 1; y < yr[1]; y++) if (y && y % 2 === 0) t += `<text class="tk" x="${sx(0) - 6}" y="${sy(y) + 4}" text-anchor="end">${fmtN(y)}</text>`;
+  t += `<text class="axl" x="${W - 5}" y="${sy(0) - 7}" text-anchor="end">x</text><text class="axl" x="${sx(0) + 7}" y="14">y</text>`;
+  let c = '';
+  for (const cv of o.curves || []) {
+    let d = '', pen = false; const step = (xr[1] - xr[0]) / 300;
+    for (let x = xr[0] - step; x <= xr[1] + step; x += step) { const y = cv.f(x); if (!isFinite(y) || y < yr[0] - 4 || y > yr[1] + 4) { pen = false; continue; } d += (pen ? 'L' : 'M') + sx(x).toFixed(1) + ' ' + sy(y).toFixed(1); pen = true; }
+    c += `<path class="cv ${cv.cls || ''}" d="${d}"/>`;
+  }
+  let p = '';
+  for (const pt of o.pts || []) {
+    p += `<circle class="pt" cx="${sx(pt.x)}" cy="${sy(pt.y)}" r="5.5"/>`;
+    if (pt.label) { const right = sx(pt.x) < W - 70; p += `<text class="ptl" x="${sx(pt.x) + (right ? 9 : -9)}" y="${sy(pt.y) - 9}" text-anchor="${right ? 'start' : 'end'}">${pt.label}</text>`; }
+  }
+  return `<svg class="plot" viewBox="-6 -6 ${W + 12} ${H + 12}" role="img" aria-label="${o.aria || 'Graph on a coordinate grid'}"><defs><clipPath id="${id}"><rect x="0" y="0" width="${W}" height="${H}"/></clipPath></defs>${g}<g clip-path="url(#${id})">${c}</g>${t}${p}</svg>`;
+}
+function xyTable(xs, ys) {
+  return `<div class="tblwrap"><table class="xy"><tr><th scope="row"><i>x</i></th>${xs.map(v => `<td>${Rm(String(v))}</td>`).join('')}</tr><tr><th scope="row"><i>y</i></th>${ys.map(v => `<td>${Rm(String(v))}</td>`).join('')}</tr></table></div>`;
+}
+function figHTML(f) {
+  if (f.kind === 'line') return plot({ curves: [{ f: x => f.m * x + f.b }], pts: f.pts.map(([x, y]) => ({ x, y })), aria: 'A line on a coordinate grid with two marked points' });
+  if (f.kind === 'table') return xyTable(f.xs, f.ys);
+  return '';
+}
+function stepsHTML(steps, hideFrom) {
+  const body = x => !x ? '' : typeof x === 'object' ? `<div class="sm wk">${E.renderWork(x)}</div>` : `<span class="sm">${Rm(x)}</span>`;
+  return `<ol class="steps">${steps.map((s, i) => `<li${hideFrom !== undefined && i >= hideFrom ? ' hidden' : ''}><span class="say">${Rp(s[0])}</span>${body(s[1])}</li>`).join('')}</ol>`;
+}
+function dots(sid) {
+  const st = saved.st[sid];
+  if (st && st.d) return '<span class="dots done" aria-label="checked off">✓</span>';
+  const s = st ? Math.min(st.s, 3) : 0;
+  return `<span class="dots" aria-label="${s} of 3 in a row">${[0, 1, 2].map(i => `<i class="${i < s ? 'on' : ''}"></i>`).join('')}</span>`;
+}
+function squares(skills) { return `<span class="sq">${skills.map(s => `<i class="${isDone(s) ? 'on' : ''}" title="${E.SKILLS[s].name}"></i>`).join('')}</span>`; }
+const doneCount = list => list.filter(isDone).length;
+const ALL = Object.keys(E.SKILLS);
+
+/* ---------- home ---------- */
+function home() {
+  const n = doneCount(ALL);
+  let h = `<section class="hero">
+    <p class="eyebrow">TSIA2 Math · Three-hour bootcamp</p>
+    <h1>Get to <span class="score">950</span>.</h1>
+    <p class="lede">Four skills show up again and again on the TSI math test. Today you learn each one, then practice it until it sticks. Get three right in a row and that skill is checked off.</p>
+    <div class="hero-row">
+      <button class="btn primary" data-act="go" data-go="1">Start Module 1</button>
+      <div class="meter" aria-label="${n} of 16 skills checked off">${MODS.map(m => squares(m.skills)).join('')}<span class="meter-t"><b>${n}</b> of 16 skills checked off</span></div>
+    </div>
+  </section>
+  <section class="block">
+    <h2>How the math test works</h2>
+    <ul class="facts">
+      <li><b>20</b><span>questions on the math section</span></li>
+      <li><b>One at a time</b><span>You can’t skip a question or go back to change an answer.</span></li>
+      <li><b>No handheld calculator</b><span>Some questions have a calculator built into the screen.</span></li>
+      <li><b>No time limit</b><span>Slow down and check your work.</span></li>
+    </ul>
+    <p class="fine">College ready in math means a score of <b>950 or higher</b> on a scale that runs from 910 to 990.</p>
+  </section>
+  <section class="block">
+    <h2>Today’s plan</h2>
+    <ol class="agenda">`;
+  for (const a of AGENDA) {
+    if (a.mod) {
+      const m = MODS[a.mod - 1];
+      h += `<li><span class="at">${a.at}</span><div class="ag-main"><button class="ag-title" data-act="go" data-go="${m.n}"><span class="ag-n">${m.n}</span>${m.title}</button><span class="ag-note">${m.mins} minutes · ${m.skills.map(s => E.SKILLS[s].name).join(' · ')}</span></div>${squares(m.skills)}</li>`;
+    } else {
+      h += `<li class="${a.brk ? 'brk' : ''}"><span class="at">${a.at}</span><div class="ag-main">${a.go ? `<button class="ag-title" data-act="go" data-go="${a.go}">${a.title}</button>` : `<span class="ag-title plain">${a.title}</span>`}<span class="ag-note">${a.mins} minutes · ${a.note}</span></div><span></span></li>`;
+    }
+  }
+  h += `<li class="end"><span class="at">3:00</span><div class="ag-main"><span class="ag-title plain">Done</span></div><span></span></li></ol></section>
+  <section class="block">
+    <h2>Four habits that save points</h2>
+    <div class="habits">${HABITS.map(([t, d], i) => `<div class="habit"><span class="hn">${i + 1}</span><div><h3>${t}</h3><p>${Rp(d)}</p></div></div>`).join('')}</div>
+  </section>
+  <details class="teacher block">
+    <summary>Teacher notes</summary>
+    <ul>
+      <li>Project a module’s <b>Learn</b> tab and click <b>Next step</b> to walk through each example with the class.</li>
+      <li>Students then open this same link on their own device and switch to <b>Practice</b>. Every problem is generated fresh, so neighbors get different numbers.</li>
+      <li>Three correct in a row, without a hint, checks off a skill. Ask students to show you their four checks before the class moves on.</li>
+      <li>Progress is saved only in each student’s own browser on that device. Nothing is sent to you or anyone else.</li>
+      <li>Use the <b>A+</b> button in the top bar to make everything larger on the projector.</li>
+    </ul>
+  </details>
+  <p class="reset"><button class="linkbtn" data-act="reset">${S.arm ? 'Tap again to erase all progress on this device' : 'Start over and erase my progress'}</button></p>`;
+  return h;
+}
+
+/* ---------- module pages ---------- */
+function exampleHTML(id, ex) {
+  const n = S.ex[id] || 0, total = ex.steps.length;
+  let h = `<div class="ex" id="ex-${id}"><p class="ex-q"><span class="tag">Example</span> ${Rp(ex.q)}</p>`;
+  if (ex.tbl) h += xyTable(ex.tbl.xs, ex.tbl.ys);
+  h += stepsHTML(ex.steps, n);
+  h += `<div class="ex-ctrl">${n < total ? `<button class="btn primary sm" data-act="ex-next" data-ex="${id}">${n === 0 ? 'Show the first step' : 'Next step'}<span class="cnt">${n + 1} of ${total}</span></button><button class="btn ghost sm" data-act="ex-all" data-ex="${id}">Show all steps</button>` : `<button class="btn ghost sm" data-act="ex-reset" data-ex="${id}">Hide the steps</button>`}</div></div>`;
+  return h;
+}
+function shiftEq() { const { h, k } = S.shift; return `y = ${h === 0 ? 'x' : `(x ${h > 0 ? '-' : '+'} ${Math.abs(h)})`}^2${k ? (k > 0 ? ` + ${k}` : ` - ${-k}`) : ''}`; }
+function shiftPlot() { const { h, k } = S.shift; return plot({ curves: [{ f: x => x * x, cls: 'parent' }, { f: x => (x - h) * (x - h) + k }], pts: [{ x: h, y: k, label: `(${fmtN(h)}, ${fmtN(k)})` }], aria: 'Parabola that moves with the sliders' }); }
+const hDesc = h => h === 0 ? 'no shift' : `${h > 0 ? 'right' : 'left'} ${Math.abs(h)}`, kDesc = k => k === 0 ? 'no shift' : `${k > 0 ? 'up' : 'down'} ${Math.abs(k)}`;
+function shiftFig() {
+  const { h, k } = S.shift;
+  return `<div class="shift"><div class="shift-plot" id="sh-plot">${shiftPlot()}</div><div class="shift-ctl">
+    <p class="shift-eq" id="sh-eq">${Rm(shiftEq())}</p>
+    <label for="sh-h">Left or right: <b id="sh-hd">${hDesc(h)}</b></label><input id="sh-h" type="range" min="-4" max="4" step="1" value="${h}" data-act="shift">
+    <label for="sh-k">Down or up: <b id="sh-kd">${kDesc(k)}</b></label><input id="sh-k" type="range" min="-4" max="4" step="1" value="${k}" data-act="shift">
+    <p class="fine">The dashed curve is the original, <span class="m"><i>y</i> = <i>x</i><sup>2</sup></span>. Slide right and watch the sign inside the parentheses turn negative.</p></div></div>`;
+}
+function learn(m) {
+  let h = '';
+  m.moves.forEach((mv, i) => {
+    h += `<section class="move"><span class="move-n">${i + 1}</span><div class="move-body"><h2>${mv.t}</h2><p class="rule">${Rp(mv.rule)}</p>`;
+    if (mv.words) h += `<div class="tblwrap"><table class="words"><thead><tr><th>When you read…</th><th>Write</th></tr></thead><tbody>${WORDS.map(([w, s]) => `<tr><td>${w}</td><td class="sym">${s}</td></tr>`).join('')}</tbody></table></div>`;
+    if (mv.fig === 'system') h += `<div class="figrow">${plot({ xr: [-2, 7], yr: [-2, 9], curves: [{ f: x => 2 * x + 1 }, { f: x => -x + 7, cls: 'alt' }], pts: [{ x: 2, y: 5, label: '(2, 5)' }], aria: 'Two lines crossing at the point (2, 5)' })}<p class="figcap"><span class="key k1"></span><span class="m"><i>y</i> = 2<i>x</i> + 1</span><br><span class="key k2"></span><span class="m"><i>y</i> = −<i>x</i> + 7</span><br>They cross at one point, so the system has exactly one solution.</p></div>`;
+    if (mv.fig === 'shift') h += shiftFig();
+    if (mv.pieces) h += `<div class="pieces">${[['100%', 'the whole'], ['50%', 'half'], ['25%', 'half of half'], ['10%', 'decimal point 1 place left'], ['5%', 'half of 10%'], ['1%', 'decimal point 2 places left']].map(([p, d]) => `<span class="pc"><b>${p}</b><span>${d}</span></span>`).join('')}</div>`;
+    if (mv.tpl) h += '<div class="pct-tpl"><span class="bf-lab l"><span>part</span><span>whole</span></span><span class="fr tpl-fr"><span class="nu">is</span><span class="de">of</span></span><span class="tpl-eq">=</span><span class="fr tpl-fr"><span class="nu">%</span><span class="de">100</span></span><span class="bf-lab r"><span>percent</span><span>always 100</span></span></div>';
+    if (mv.rules) h += `<div class="tblwrap"><table class="words"><thead><tr><th>Equation</th><th>Graph of f moves…</th></tr></thead><tbody>${RULES.map(([e, d]) => `<tr><td>${Rm(e)}</td><td>${d}</td></tr>`).join('')}</tbody></table></div>`;
+    mv.ex.forEach((ex, j) => { h += exampleHTML(`${m.n}-${i}-${j}`, ex); });
+    h += `<p class="watch"><span class="pen">Watch out</span> ${Rp(mv.watch)}</p></div></section>`;
+  });
+  h += `<aside class="tip"><p class="tip-h">TSI tip</p><p>${Rp(m.tip)}</p></aside>
+    <div class="next-row"><button class="btn primary" data-act="tab" data-tab="practice">Practice these four skills</button></div>`;
+  return h;
+}
+function ensurePrac(n) {
+  const m = MODS[n - 1];
+  if (!S.prac[n]) S.prac[n] = { src: m.skills.find(s => !isDone(s)) || m.skills[0] };
+  if (!S.prac[n].p) newProblem(S.prac[n], n);
+  return S.prac[n];
+}
+function newProblem(P, n) {
+  const sid = P.src === 'mix' ? MODS[n - 1].skills[Math.floor(Math.random() * 4)] : P.src;
+  Object.assign(P, { p: E.generate(sid), sel: null, done: false, hint: false, steps: false });
+}
+function card(P, o) {
+  const p = P.p;
+  let h = `<article class="card prob"><p class="eyebrow">${o.label || E.SKILLS[p.skill].name}</p>`;
+  if (p.quote) h += `<p class="quote">${Rp(p.quote)}</p>`;
+  h += `<p class="q">${Rp(p.q)}</p>`;
+  if (p.big && p.big.length) h += `<div class="big">${p.big.map(b => `<div>${Rm(b)}</div>`).join('')}</div>`;
+  if (p.fig) h += figHTML(p.fig);
+  const wide = p.choices.some(c => c.t !== undefined && c.t.length > 22);
+  h += `<div class="choices${wide ? ' one' : ''}" role="group" aria-label="Answer choices">` + p.choices.map((c, i) => {
+    let cls = ''; if (P.done) cls = c.ok ? ' right' : i === P.sel ? ' wrong' : ' dim';
+    return `<button class="choice${cls}" data-act="pick" data-i="${i}" aria-pressed="${i === P.sel}"${P.done ? ' disabled' : ''}><span class="bub">${LET[i]}</span><span class="ct">${c.m !== undefined ? Rm(c.m) : Rp(c.t)}</span></button>`;
+  }).join('') + '</div>';
+  if (!P.done) {
+    if (P.hint) h += `<p class="hintbox"><b>Hint.</b> ${Rp(p.hint)}</p>`;
+    h += `<div class="actions"><button class="btn ghost" data-act="hint"${P.hint ? ' disabled' : ''}>${P.hint ? 'Hint is showing' : 'Show a hint'}</button><button class="btn primary" data-act="check"${P.sel === null ? ' disabled' : ''}>Check answer</button></div>`;
+  } else {
+    const c = p.choices[P.sel], key = p.choices.findIndex(x => x.ok);
+    h += `<div class="fb ${c.ok ? 'yes' : 'no'}" role="status"><p class="fb-h">${c.ok ? '✓ Correct' : `✗ Not quite. The answer is ${LET[key]}.`}</p>${c.ok ? '' : `<p>${Rp(c.why)}</p>`}${c.ok && P.hint ? '<p class="fine">Hints don’t count toward the three-in-a-row streak, so try the next one without it.</p>' : ''}</div>`;
+    h += `<div class="actions"><button class="btn ghost" data-act="steps" aria-expanded="${P.steps}">${P.steps ? 'Hide the steps' : 'See how to solve it'}</button><button class="btn primary" data-act="next">${o.next || 'Next problem'}</button></div>`;
+    if (P.steps) h += `<div class="sol"><p class="tag">How to solve it</p>${stepsHTML(p.steps)}</div>`;
+  }
+  return h + '</article>';
+}
+function streakLine(P) {
+  if (P.src === 'mix') return 'Mixed practice: each problem comes from one of the four skills.';
+  const st = saved.st[P.src];
+  if (st && st.d) return `<b>${E.SKILLS[P.src].name}</b> is checked off ✓. Keep practicing, or pick another skill.`;
+  const s = st ? Math.min(st.s, 2) : 0, name = `<b>${E.SKILLS[P.src].name}</b>`;
+  if (s === 2) return `${name}: 2 in a row. One more right checks off this skill.`;
+  return `${name}: ${s} in a row. Get 3 right in a row, without a hint, to check it off.`;
+}
+function practice(m) {
+  const P = ensurePrac(m.n);
+  let h = `<div class="chips" role="group" aria-label="Choose a skill">${m.skills.map(s => `<button class="chip" data-act="skill" data-skill="${s}" aria-pressed="${P.src === s}">${E.SKILLS[s].name}${dots(s)}</button>`).join('')}<button class="chip" data-act="skill" data-skill="mix" aria-pressed="${P.src === 'mix'}">Mix all four</button></div>
+    <p class="streak" id="streak">${streakLine(P)}</p>
+    <div id="card">${card(P, {})}</div>
+    <p class="fine center">New numbers every time you press Next problem. Keys: A–D to pick, Enter to check.</p>`;
+  const nx = MODS[m.n];
+  h += `<div class="next-row"><span class="fine">${doneCount(m.skills)} of 4 skills checked off in this module.</span>${nx ? `<button class="btn ghost" data-act="go" data-go="${nx.n}">Next: Module ${nx.n}</button>` : '<button class="btn ghost" data-act="go" data-go="mix">Next: Mixed review</button>'}</div>`;
+  return h;
+}
+function modulePage(n) {
+  const m = MODS[n - 1], tab = S.tab[n] || 'learn';
+  return `<header class="mod-head"><p class="eyebrow">Module ${m.n} · ${m.mins} minutes · ${m.at}</p><h1>${m.title}</h1><p class="why">${m.why}</p>
+    <div class="seg" role="tablist"><button role="tab" data-act="tab" data-tab="learn" aria-selected="${tab === 'learn'}">Learn</button><button role="tab" data-act="tab" data-tab="practice" aria-selected="${tab === 'practice'}">Practice ${squares(m.skills)}</button></div></header>
+    <div class="mod-body">${tab === 'learn' ? learn(m) : practice(m)}</div>`;
+}
+
+/* ---------- mixed review ---------- */
+function startMix() {
+  const pick2 = a => a.slice().sort(() => Math.random() - 0.5).slice(0, 2);
+  let list = MODS.flatMap(m => pick2(m.skills));
+  const rest = ALL.filter(s => !list.includes(s)).sort(() => Math.random() - 0.5).slice(0, 2);
+  list = list.concat(rest).sort(() => Math.random() - 0.5);
+  S.mix = { list, i: 0, res: [], P: { p: E.generate(list[0]), sel: null, done: false, hint: false, steps: false } };
+}
+function mixPage() {
+  let h = '<header class="mod-head"><p class="eyebrow">Last 10 minutes</p><h1>Mixed review</h1>';
+  if (!S.mix) return h + `<p class="why">Ten problems that jump between all four modules, the way the real test does. Each one still counts toward your skill streaks.</p></header><div class="next-row start"><button class="btn primary" data-act="mix-start">Start the mixed review</button></div>`;
+  const X = S.mix;
+  if (X.i >= X.list.length) {
+    const right = X.res.filter(r => r.ok).length, missed = [...new Set(X.res.filter(r => !r.ok).map(r => r.sid))];
+    h += `<p class="why">You got <b>${right} of ${X.list.length}</b>. ${missed.length ? 'Go back and practice the skills you missed.' : 'Every one right. Nice work.'}</p></header><ol class="results">${X.res.map((r, i) => `<li class="${r.ok ? 'ok' : 'no'}"><span class="rn">${i + 1}</span><span>${E.SKILLS[r.sid].name}</span><span class="rk">${r.ok ? '✓' : '✗'}</span></li>`).join('')}</ol>`;
+    if (missed.length) h += `<div class="chips">${missed.map(s => `<button class="chip" data-act="drill" data-skill="${s}">Practice: ${E.SKILLS[s].name}</button>`).join('')}</div>`;
+    return h + '<div class="next-row start"><button class="btn primary" data-act="mix-start">Try another set of ten</button></div>';
+  }
+  h += `<p class="why">Question <b>${X.i + 1}</b> of ${X.list.length} · ${X.res.filter(r => r.ok).length} right so far</p></header>`;
+  return h + `<div id="card">${card(X.P, { label: `Module ${E.SKILLS[X.P.p.skill].mod} · ${E.SKILLS[X.P.p.skill].name}`, next: X.i === X.list.length - 1 ? 'See my results' : 'Next question' })}</div>`;
+}
+
+/* ---------- distribution arrows ---------- */
+function drawArcs() {
+  document.querySelectorAll('.dist').forEach(el => {
+    el.querySelectorAll('svg.arcs').forEach(s => s.remove());
+    const box = el.getBoundingClientRect(); if (!box.width) return;
+    const A = el.querySelector('.d-a').getBoundingClientRect(), fs = parseFloat(getComputedStyle(el).fontSize), H = fs * 1.2;
+    const ax = A.left + A.width / 2 - box.left; let paths = '';
+    el.querySelectorAll('.d-t').forEach((t, i) => {
+      const r = t.getBoundingClientRect(), tx = r.left + r.width / 2 - box.left, h = H * (0.62 + 0.38 * i), cx = (ax + tx) / 2, cy = H - h * 1.7;
+      const y0 = H - fs * 0.05, ex = tx, ey = y0, dx = ex - cx, dy = ey - cy, len = Math.hypot(dx, dy), ux = dx / len, uy = dy / len, s = fs * 0.32;
+      paths += `<path class="arc" d="M${(ax + 2).toFixed(1)} ${y0.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${ex.toFixed(1)} ${(ey - s * 0.6).toFixed(1)}"/>`;
+      paths += `<path class="ah" d="M${ex.toFixed(1)} ${ey.toFixed(1)} L ${(ex - ux * s - uy * s * 0.55).toFixed(1)} ${(ey - uy * s + ux * s * 0.55).toFixed(1)} L ${(ex - ux * s + uy * s * 0.55).toFixed(1)} ${(ey - uy * s - ux * s * 0.55).toFixed(1)} Z"/>`;
+    });
+    el.insertAdjacentHTML('afterbegin', `<svg class="arcs" aria-hidden="true" width="${box.width.toFixed(0)}" height="${H.toFixed(0)}" style="top:${(-H).toFixed(0)}px">${paths}</svg>`);
+  });
+  drawWings();
+}
+function drawWings() {
+  document.querySelectorAll('.bf').forEach(el => {
+    el.querySelectorAll('svg.wings').forEach(s => s.remove());
+    const box = el.getBoundingClientRect(); if (!box.width) return;
+    const ctr = sel => { const r = el.querySelector(sel).getBoundingClientRect(); return [r.left + r.width / 2 - box.left, r.top + r.height / 2 - box.top, r.width, r.height]; };
+    const A = ctr('.bf-a'), B = ctr('.bf-b'), C = ctr('.bf-c'), D = ctr('.bf-d');
+    const seg = (P, Q, cls) => {
+      const dx = Q[0] - P[0], dy = Q[1] - P[1], L = Math.hypot(dx, dy), ux = dx / L, uy = dy / L;
+      const s1 = Math.min(P[2] / 2 / Math.abs(ux || 1e-6), P[3] / 2 / Math.abs(uy || 1e-6)) + 2, s2 = Math.min(Q[2] / 2 / Math.abs(ux || 1e-6), Q[3] / 2 / Math.abs(uy || 1e-6)) + 2;
+      return `<line class="${cls}" x1="${(P[0] + ux * s1).toFixed(1)}" y1="${(P[1] + uy * s1).toFixed(1)}" x2="${(Q[0] - ux * s2).toFixed(1)}" y2="${(Q[1] - uy * s2).toFixed(1)}"/>`;
+    };
+    el.insertAdjacentHTML('afterbegin', `<svg class="wings" aria-hidden="true" width="${box.width.toFixed(0)}" height="${box.height.toFixed(0)}">${seg(A, D, 'w1')}${seg(B, C, 'w2')}</svg>`);
+  });
+}
+let arcTimer; window.addEventListener('resize', () => { clearTimeout(arcTimer); arcTimer = setTimeout(drawArcs, 120); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawArcs);
+
+/* ---------- render + events ---------- */
+function render(scrollTop) {
+  document.querySelectorAll('[data-nav]').forEach(b => b.setAttribute('aria-current', String(b.dataset.nav) === String(S.view) ? 'page' : 'false'));
+  app.innerHTML = S.view === 'home' ? home() : S.view === 'mix' ? mixPage() : modulePage(+S.view);
+  if (scrollTop) window.scrollTo(0, 0);
+  drawArcs();
+}
+function current() {
+  if (S.view === 'mix') return S.mix && S.mix.i < S.mix.list.length ? { P: S.mix.P, mix: true } : null;
+  const n = +S.view; if (n && S.tab[n] === 'practice') return { P: S.prac[n], n };
+  return null;
+}
+function refreshCard() {
+  const c = current(); if (!c) return render();
+  if (c.mix) { render(); return; }
+  document.getElementById('card').innerHTML = card(c.P, {});
+  const st = document.getElementById('streak'); if (st) st.innerHTML = streakLine(c.P);
+  document.querySelectorAll('.chip[data-skill]').forEach(b => { const s = b.dataset.skill; if (s !== 'mix') b.innerHTML = E.SKILLS[s].name + dots(s); });
+  const seg = document.querySelector('.seg [data-tab="practice"]'); if (seg) seg.innerHTML = 'Practice ' + squares(MODS[c.n - 1].skills);
+  drawArcs();
+}
+function check() {
+  const c = current(); if (!c || c.P.done || c.P.sel === null) return;
+  const P = c.P, ok = P.p.choices[P.sel].ok, st = stat(P.p.skill);
+  P.done = true; st.t++;
+  if (ok) { st.r++; if (!P.hint) st.s++; } else st.s = 0;
+  if (st.s >= 3) st.d = true;
+  save();
+  if (c.mix) S.mix.res.push({ sid: P.p.skill, ok });
+  if (c.mix) render(); else refreshCard();
+  const fb = document.querySelector('.fb'); if (fb) fb.scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+}
+function next() {
+  const c = current(); if (!c) return;
+  if (c.mix) { const X = S.mix; X.i++; if (X.i < X.list.length) X.P = { p: E.generate(X.list[X.i]), sel: null, done: false, hint: false, steps: false }; render(true); return; }
+  newProblem(c.P, c.n); refreshCard();
+  const card = document.getElementById('card'); if (card && card.getBoundingClientRect().top < 0) card.scrollIntoView({ block: 'start' });
+}
+function go(v) { S.view = v; S.arm = false; render(true); }
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
+  const a = b.dataset.act, c = current();
+  if (a === 'go') return go(b.dataset.go);
+  if (a === 'tab') { S.tab[+S.view] = b.dataset.tab; render(true); return; }
+  if (a === 'skill') { const n = +S.view; S.prac[n].src = b.dataset.skill; newProblem(S.prac[n], n); document.querySelectorAll('.chip[data-skill]').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.skill === b.dataset.skill))); refreshCard(); return; }
+  if (a === 'drill') { const sid = b.dataset.skill, n = E.SKILLS[sid].mod; S.tab[n] = 'practice'; S.prac[n] = { src: sid }; go(String(n)); return; }
+  if (a === 'pick' && c && !c.P.done) { c.P.sel = +b.dataset.i; c.mix ? render() : refreshCard(); return; }
+  if (a === 'hint' && c) { c.P.hint = true; c.mix ? render() : refreshCard(); return; }
+  if (a === 'check') return check();
+  if (a === 'steps' && c) { c.P.steps = !c.P.steps; c.mix ? render() : refreshCard(); return; }
+  if (a === 'next') return next();
+  if (a === 'mix-start') { startMix(); render(true); return; }
+  if (a === 'ex-next' || a === 'ex-all' || a === 'ex-reset') {
+    const id = b.dataset.ex, [mi, vi, ei] = id.split('-').map(Number), ex = MODS[mi - 1].moves[vi].ex[ei];
+    S.ex[id] = a === 'ex-reset' ? 0 : a === 'ex-all' ? ex.steps.length : Math.min((S.ex[id] || 0) + 1, ex.steps.length);
+    const el = document.getElementById('ex-' + id); el.outerHTML = exampleHTML(id, ex); drawArcs();
+    const btn = document.querySelector(`#ex-${id} .ex-ctrl .btn`); if (btn) btn.focus({ preventScroll: true });
+    return;
+  }
+  if (a === 'reset') { if (!S.arm) { S.arm = true; render(); return; } saved.st = {}; save(); S.arm = false; S.prac = {}; S.mix = null; render(); return; }
+  if (a === 'big') { saved.big = !saved.big; save(); applyBig(); }
+});
+document.addEventListener('input', e => {
+  if (e.target.dataset.act !== 'shift') return;
+  S.shift.h = +document.getElementById('sh-h').value; S.shift.k = +document.getElementById('sh-k').value;
+  document.getElementById('sh-plot').innerHTML = shiftPlot();
+  document.getElementById('sh-eq').innerHTML = Rm(shiftEq());
+  document.getElementById('sh-hd').textContent = hDesc(S.shift.h); document.getElementById('sh-kd').textContent = kDesc(S.shift.k);
+});
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  const tag = (e.target.tagName || '').toLowerCase(); if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+  const c = current(); if (!c) return;
+  const k = e.key.toLowerCase(), idx = 'abcd'.indexOf(k) >= 0 ? 'abcd'.indexOf(k) : '1234'.indexOf(k);
+  if (idx >= 0 && !c.P.done) { c.P.sel = idx; c.mix ? render() : refreshCard(); e.preventDefault(); return; }
+  if (k === 'enter' && !(tag === 'button' && e.target.closest('#card'))) { if (c.P.done) next(); else if (c.P.sel !== null) check(); else return; e.preventDefault(); }
+});
+function applyBig() { document.documentElement.classList.toggle('big', !!saved.big); const b = document.getElementById('bigBtn'); if (b) b.setAttribute('aria-pressed', String(!!saved.big)); }
+applyBig();
+render();
+})();
+
+</script>
+
+</body>
+</html>
