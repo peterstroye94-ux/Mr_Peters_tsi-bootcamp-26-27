@@ -1677,7 +1677,7 @@ function card(P, o) {
     const c = p.choices[P.sel], key = p.choices.findIndex(x => x.ok);
     h += `<div class="fb ${c.ok ? 'yes' : 'no'}" role="status"><p class="fb-h">${c.ok ? '✓ Correct' : `✗ Not quite. The answer is ${LET[key]}.`}</p>${c.ok ? '' : `<p>${Rp(c.why)}</p>`}${c.ok && P.hint ? '<p class="fine">Hints don’t count toward the three-in-a-row streak, so try the next one without it.</p>' : ''}</div>`;
     h += `<div class="actions"><button class="btn ghost" data-act="steps" aria-expanded="${P.steps}">${P.steps ? 'Hide the steps' : 'See how to solve it'}</button><button class="btn primary" data-act="next">${o.next || 'Next problem'}</button></div>`;
-    if (P.steps) h += `<div class="sol"><p class="tag">How to solve it</p>${stepsHTML(p.steps)}</div>`;
+    if (P.steps) h += `<div class="sol"><p class="tag">${c.ok ? 'Check your work against these steps' : 'How to solve it'}</p>${stepsHTML(p.steps)}</div>`;
   }
   return h + '</article>';
 }
@@ -1787,7 +1787,7 @@ function check() {
   const c = current(); if (!c || c.P.done || c.P.sel === null) return;
   const P = c.P, ok = P.p.choices[P.sel].ok, st = stat(P.p.skill);
   P.done = true; st.t++;
-  if (ok) { st.r++; if (!P.hint) st.s++; } else st.s = 0;
+  if (ok) { st.r++; if (!P.hint) st.s++; P.steps = true; } else st.s = 0;
   if (st.s >= 3) st.d = true;
   save();
   if (c.mix) S.mix.res.push({ sid: P.p.skill, ok });
