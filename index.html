@@ -1154,7 +1154,7 @@ function s3b() {
     const cands = [isInt(ch / nw * 100) ? { t: pct(ch / nw * 100), why: `The original price, ${money(o)}, is the “of,” so it goes on the bottom. You used the new price: ${fr}.` } : null,
       ch !== p ? { t: pct(ch), why: `${money(ch)} is the change in dollars, not the percent. Set up ${fr} and use the butterfly method.` } : null,
       { t: pct(nw / o * 100), why: `The <b>change</b> is the “is,” not the new price: ${fr}.` }];
-    return { q: `${thing} went from ${money(o)} to ${money(nw)}. What is the percent ${word}?`, big: [], choices: mc({ t: pct(p) }, cands, numFb(p, v => v > 0 ? { t: pct(v), why: `Recheck: write ${fr}, simplify, and make the bottom 100.` } : null)),
+    return { q: `${thing} went from ${money(o)} to ${money(nw)}. What is the percent ${word}?`, big: [], choices: mc({ t: pct(p) }, cands, numFb(p, v => v > 0 ? { t: pct(v), why: `Recheck: set up ${fr}, simplify, and use the butterfly method.` } : null)),
       hint: 'Use “is over of equals percent over 100.” The change is the “is,” and the original price is the “of.”',
       steps: [[`Find the change: ${up ? 'new price minus original price' : 'original price minus new price'}.`, `${Math.max(nw, o)} - ${Math.min(nw, o)} = ${ch}`]].concat(bfUnknownPct(ch, o, 'The change', 'the original price')).concat([[`That's a ${p}% ${word}.`, null]]),
       spec: { type: 'num', fn: 'change', p: { o, n: nw } } };
