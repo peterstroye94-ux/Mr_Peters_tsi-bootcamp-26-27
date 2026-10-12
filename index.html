@@ -524,6 +524,25 @@ function ladderInfo(w) {
   }
   return { rows: w.rows, build, answer: build ? build.ans : w.rows[w.rows.length - 1][1], F };
 }
+/* ---------- butterfly percent setups ---------- */
+const PCT_SET = 'Set up “is over of equals percent over 100.”';
+function bfUnknownPct(top, bottom, isWord, ofWord) { // {top/bottom} = {x/100}
+  const g = gcd(top, bottom), st = top / g, sb = bottom / g;
+  const out = [[`${PCT_SET} ${isWord} (is) is ${top}, ${ofWord} (of) is ${bottom}, and the percent is unknown.`, { t: 'bf', a: ns(top), b: ns(bottom), c: 'x', d: '100', lab: true, noProd: g > 1 }]];
+  if (g > 1) out.push([`Make it easier: simplify \`{${top}/${bottom}}\` by dividing the top and bottom by ${g}.`, `{${top}/${bottom}} = {${st}/${sb}}`], ['Now use the butterfly method: multiply along each wing.', { t: 'bf', a: ns(st), b: ns(sb), c: 'x', d: '100' }]);
+  if (sb !== 1) out.push([`Divide both sides by ${sb}.`, { t: 'bal', L: [[sb, 'x']], R: [[100 * st, '']], div: sb, dec: true }]);
+  return out;
+}
+function bfUnknownWhole(part, P, isWord, ofWord, money) { // {part/x} = {P/100}
+  const g = gcd(P, 100), a = P / g, b = 100 / g, W = r4(part * 100 / P), fx = v => money && !isInt(r2(v)) ? r2(v).toFixed(2) : ns(v);
+  const out = [[`${PCT_SET} ${isWord} (is) is ${fx(part)}, ${ofWord} (of) is unknown, and the percent is ${P}.`, { t: 'bf', a: ns(part), b: 'x', c: ns(P), d: '100', lab: true, noProd: true }],
+    [`Make it easier: simplify \`{${P}/100}\` by dividing the top and bottom by ${g}.`, `{${P}/100} = {${a}/${b}}`],
+    ['Now use the butterfly method: multiply along each wing.', { t: 'bf', a: ns(part), b: 'x', c: ns(a), d: ns(b) }]];
+  if (a !== 1) out.push([`Divide both sides by ${a}.`, { t: 'bal', L: [[a, 'x']], R: [[r4(part * b), '']], div: a, dec: true, money: !!money }]);
+  else out.push([`Multiply to finish.`, `x = ${ns(part)} * ${b} = ${ns(W)}`]);
+  return out;
+}
+
 /* ---------- old-school vertical multiplication ---------- */
 const pctDec = P => numStr(P / 100);
 function pctToDecSay(P) { const d = pctDec(P), raw = (P % 10 === 0 && P < 100 && P >= 10) ? `${d}0` : null; return `${P}% = ${raw ? `${raw}, or just ${d}` : d}`; }
@@ -1080,22 +1099,22 @@ function s3a() {
   }
   if (r0 < 0.7) {
     let P, W, part; do { W = pick([20, 24, 25, 40, 48, 50, 60, 64, 72, 80, 120, 200]); P = pick([5, 10, 20, 25, 40, 50, 60, 75, 80, 15]); part = W * P / 100; } while (!isInt(part));
-    const fr = `\`{${part}/${W}}\``;
-    const cands = [isInt(W / part * 100) ? { t: pct(W / part * 100), why: `Upside down. The part (${part}) goes on top of the whole (${W}): ${fr}.` } : null,
-      { t: pct(W - part), why: `Subtracting doesn't make a percent. Write ${fr}, then make the bottom 100.` },
-      { t: pct(part / W), why: `${ns(part / W)} is the decimal. Make the bottom 100 instead: the top number is the percent.` }];
+    const fr = `\`{${part}/${W}} = {x/100}\``;
+    const cands = [isInt(W / part * 100) ? { t: pct(W / part * 100), why: `Upside down. ${part} is the “is,” so it goes on top, and ${W} is the “of,” so it goes on the bottom: ${fr}.` } : null,
+      { t: pct(W - part), why: `Subtracting doesn't make a percent. Set up ${fr} and use the butterfly method.` },
+      { t: pct(part / W), why: `${ns(part / W)} is the decimal, not the percent. With ${fr}, x comes out as the percent.` }];
     return { q: `${part} is what percent of ${W}?`, big: [], choices: mc({ t: pct(P) }, cands, numFb(P, v => v > 0 ? { t: pct(v), why: `Check: ${ns(v)}% of ${W} is ${ns(v * W / 100)}, not ${part}.` } : null)),
-      hint: 'Write the part over the whole. Simplify, then make the bottom 100. The top number is the percent.',
-      steps: hundredSteps(part, W, P, 'Write the part over the whole.').concat([[`Check it the old-school way: ${P}% of ${W} should give ${part}. Multiply ${W} × ${pctDec(P)}.`, vmul(W, P / 100)]]), spec: { type: 'num', fn: 'whatPct', p: { part, W } } };
+      hint: 'Use “is over of equals percent over 100.” The percent is unknown, so x goes over the 100. Then use the butterfly method.',
+      steps: bfUnknownPct(part, W, 'The part', 'the whole').concat([[`The answer is ${P}%.`, null]]), spec: { type: 'num', fn: 'whatPct', p: { part, W } } };
   }
   let P, W, part; do { P = pick([10, 20, 25, 40, 50, 75, 30, 60, 15]); W = pick([20, 40, 60, 80, 100, 120, 160, 200, 240]); part = P * W / 100; } while (!isInt(part));
-  const cands = [decs(part * P / 100, 2) ? { m: ns(part * P / 100), why: `You found ${P}% of ${part}. But ${part} is already ${P}% of the number, so work up to 100%.` } : null,
-    decs(part * (100 + P) / 100, 2) ? { m: ns(part * (100 + P) / 100), why: `That's ${part} increased by ${P}%. Work from ${P}% down to a friendly percent, then up to 100%.` } : null,
-    { m: ns(part + P), why: `Adding the percent doesn't work. Work from ${P}% down to a friendly percent, then up to 100%.` }];
+  const setup = `\`{${part}/x} = {${P}/100}\``;
+  const cands = [decs(part * P / 100, 2) ? { m: ns(part * P / 100), why: `You found ${P}% of ${part}. But ${part} is the “is.” The whole (the “of”) is unknown: ${setup}.` } : null,
+    decs(part * (100 + P) / 100, 2) ? { m: ns(part * (100 + P) / 100), why: `That's ${part} increased by ${P}%. Set up ${setup} and use the butterfly method.` } : null,
+    { m: ns(part + P), why: `Adding the percent doesn't work. Set up ${setup} and use the butterfly method.` }];
   return { q: `${part} is ${P}% of what number?`, big: [], choices: mc({ m: ns(W) }, cands, numFb(W, v => v > 0 ? { m: ns(v), why: `Check: ${P}% of ${ns(v)} is ${ns(P * v / 100)}, not ${part}.` } : null)),
-    hint: `${part} is ${P}% of the number. Divide to get a friendly percent like 10%, then multiply up to 100%.`,
-    steps: [[`You know ${P}% of the number is ${part}. Work down to a friendly percent, then up to 100%.`, wholeLadder(P, part)],
-      [`Check it the old-school way: ${P}% of ${W} should give ${part}. Multiply ${W} × ${pctDec(P)}.`, vmul(W, P / 100)]],
+    hint: 'Use “is over of equals percent over 100.” The whole (the “of” number) is unknown, so x goes on the bottom.',
+    steps: bfUnknownWhole(part, P, 'The part', 'the whole'),
     spec: { type: 'num', fn: 'whole', p: { part, P } } };
 }
 
@@ -1131,24 +1150,24 @@ function s3b() {
   }
   if (r0 < 0.75) {
     let o, p, up, nw; do { o = pick([20, 25, 40, 50, 60, 80, 100, 120, 150, 200]); p = pick([10, 20, 25, 40, 50, 75, 30, 60]); up = chance(0.55); nw = o * (up ? 100 + p : 100 - p) / 100; } while (!isInt(nw));
-    const ch = Math.abs(nw - o), word = up ? 'increase' : 'decrease', thing = pick(['A ticket', 'A monthly bus pass', 'A school hoodie', 'A pizza']), fr = `\`{${ch}/${o}}\``;
-    const cands = [isInt(ch / nw * 100) ? { t: pct(ch / nw * 100), why: `Put the change over the <b>original</b> price, ${money(o)}, not the new one: ${fr}.` } : null,
-      ch !== p ? { t: pct(ch), why: `${money(ch)} is the change in dollars, not the percent. Write ${fr} and make the bottom 100.` } : null,
-      { t: pct(nw / o * 100), why: `Use the <b>change</b> on top, not the new price: ${fr}.` }];
+    const ch = Math.abs(nw - o), word = up ? 'increase' : 'decrease', thing = pick(['A ticket', 'A monthly bus pass', 'A school hoodie', 'A pizza']), fr = `\`{${ch}/${o}} = {x/100}\``;
+    const cands = [isInt(ch / nw * 100) ? { t: pct(ch / nw * 100), why: `The original price, ${money(o)}, is the “of,” so it goes on the bottom. You used the new price: ${fr}.` } : null,
+      ch !== p ? { t: pct(ch), why: `${money(ch)} is the change in dollars, not the percent. Set up ${fr} and use the butterfly method.` } : null,
+      { t: pct(nw / o * 100), why: `The <b>change</b> is the “is,” not the new price: ${fr}.` }];
     return { q: `${thing} went from ${money(o)} to ${money(nw)}. What is the percent ${word}?`, big: [], choices: mc({ t: pct(p) }, cands, numFb(p, v => v > 0 ? { t: pct(v), why: `Recheck: write ${fr}, simplify, and make the bottom 100.` } : null)),
-      hint: 'Write the change over the original price. Simplify, then make the bottom 100.',
-      steps: [[`Find the change: ${up ? 'new price minus original price' : 'original price minus new price'}.`, `${Math.max(nw, o)} - ${Math.min(nw, o)} = ${ch}`]].concat(hundredSteps(ch, o, p, 'Write the change over the original price.')).concat([[`That's a ${p}% ${word}.`, null], [`Check it the old-school way: ${p}% of ${o} should give the change, ${ch}. Multiply ${o} × ${pctDec(p)}.`, vmul(o, p / 100)]]),
+      hint: 'Use “is over of equals percent over 100.” The change is the “is,” and the original price is the “of.”',
+      steps: [[`Find the change: ${up ? 'new price minus original price' : 'original price minus new price'}.`, `${Math.max(nw, o)} - ${Math.min(nw, o)} = ${ch}`]].concat(bfUnknownPct(ch, o, 'The change', 'the original price')).concat([[`That's a ${p}% ${word}.`, null]]),
       spec: { type: 'num', fn: 'change', p: { o, n: nw } } };
   }
   let O, d, F; do { O = pick([20, 25, 30, 40, 50, 60, 75, 80, 100, 120]); d = pick([10, 20, 25, 40, 50]); F = O * (100 - d) / 100; } while (!decs(F, 2));
   const pay = 100 - d, fm = moneyAll([O, F * (100 + d) / 100, F * (100 - d) / 100, F + d]);
-  const cands = [{ t: fm(F * (100 + d) / 100), why: `Adding ${d}% of the sale price doesn't undo the discount, because the ${d}% was taken from the <b>original</b> price. ${money(F)} is ${pay}% of the original, so work from ${pay}% up to 100%.` },
-    { t: fm(F * (100 - d) / 100), why: 'The original price has to be higher than the sale price.' }, { t: fm(F + d), why: `${d}% off is not ${money(d)} off. ${money(F)} is ${pay}% of the original, so work from ${pay}% up to 100%.` }];
+  const setup = `\`{${ns(F)}/x} = {${pay}/100}\``;
+  const cands = [{ t: fm(F * (100 + d) / 100), why: `Adding ${d}% of the sale price doesn't undo the discount, because the ${d}% was taken from the <b>original</b> price. ${money(F)} is ${pay}% of the original: ${setup}.` },
+    { t: fm(F * (100 - d) / 100), why: 'The original price has to be higher than the sale price.' }, { t: fm(F + d), why: `${d}% off is not ${money(d)} off. ${money(F)} is ${pay}% of the original: ${setup}.` }];
   return { q: `After a ${d}% discount, a shirt costs ${money(F)}. What was the original price?`, big: [], choices: mc({ t: fm(O) }, cands, numFb(O, v => v > 0 ? { t: fm(v), why: `Check: ${d}% off ${money(v)} is ${money(v * (100 - d) / 100)}.` } : null)),
-    hint: `You paid ${pay}% of the original price. Divide to get a friendly percent like 10%, then multiply up to 100%.`,
-    steps: [[`After ${d}% off, you paid 100% − ${d}% = ${pay}% of the original price, and that was ${money(F)}.`, null],
-      ['Work down to a friendly percent, then up to 100%.', wholeLadder(pay, F, true)],
-      [`Check it the old-school way: ${pay}% of ${money(O)} should be ${money(F)}. Multiply ${O} × ${pctDec(pay)}.`, vmul(O, pay / 100)]],
+    hint: `You paid ${pay}% of the original price. Use “is over of equals percent over 100” with the original price as the unknown “of.”`,
+    steps: [[`After ${d}% off, you paid 100% − ${d}% = ${pay}% of the original price, and that was ${money(F)}.`, null]]
+      .concat(bfUnknownWhole(F, pay, 'What you paid', 'the original price', true)).concat([[`The original price was ${money(O)}.`, null]]),
     spec: { type: 'num', fn: 'orig', p: { F, d }, money: true } };
 }
 
@@ -1524,22 +1543,22 @@ const MODS = [
   { n: 3, title: 'Percents & Proportions', short: 'Percents', mins: 35, at: '1:40–2:15', skills: ['s3a', 's3b', 's3c', 's3d'],
     why: 'Percent and ratio questions are guaranteed to show up under quantitative reasoning, and they are some of the easiest points to lock in.',
     moves: [
-      { t: 'Percent of a number: multiply the old-school way', rule: 'Change the percent to a decimal by moving the decimal point two places left: 35% = .35. Then multiply the way you learned in elementary school. Line up the <b>right edges</b>, not the decimal points. Multiply like whole numbers, add the rows, and count the decimal places.',
-        ex: [{ q: 'What is 35% of 140?', steps: [['Change the percent to a decimal: 35% = .35.', null], ['Multiply 140 × .35. Line up the right edges and multiply like whole numbers. The small numbers above 140 are the carries.', { t: 'vmul', a: 140, b: 0.35 }], ['49.00 is the same as 49.', null]] },
-          { q: '18 is what percent of 72?', steps: [['Write the part over the whole.', '{18/72}'], ['Simplify: divide the top and bottom by 18.', '{18/72} = {1/4}'], ['Make the bottom 100: multiply the top and bottom by 25.', '{1/4} = {25/100}'], ['“Out of 100” is a percent. The answer is 25%.', '{25/100} = 25%'], ['Check it the old-school way: 25% of 72 should give 18.', { t: 'vmul', a: 72, b: 0.25 }]] },
-          { q: '15 is 30% of what number?', steps: [['You know 30% of the number is 15. Work down to 10%, then up to 100%.', { t: 'ladder', rows: [[30, 15, 'what you know'], [10, 5, '÷ 3'], [100, 50, '× 10']] }], ['Check it the old-school way: 30% of 50 should give 15.', { t: 'vmul', a: 50, b: 0.3 }]] }],
-        watch: 'Line up the right edges when you multiply. Lining up the decimal points is only for adding and subtracting. Then count the decimal places in <b>both</b> numbers: .35 has two, so the answer gets two.' },
-      { t: 'Discounts, tax, and markups: one multiplication', rule: 'Turn the whole story into one multiplication. For 25% off, you still pay 75%, so multiply by .75. For 8.25% tax, you pay 108.25%, so multiply by 1.0825. For a 35% increase, multiply by 1.35. Put the number with fewer digits on the bottom.',
-        ex: [{ q: 'A $60 jacket is 25% off. What is the sale price?', steps: [['25% off means you still pay 100% − 25% = 75%. As a decimal, that is .75.', null], ['Multiply 60 × .75 the old-school way.', { t: 'vmul', a: 60, b: 0.75 }], ['The sale price is $45.', null]] },
-          { q: 'Dallas sales tax is 8.25%. What do you pay for a $40 item?', steps: [['With tax you pay 100% + 8.25% = 108.25%. As a decimal, that is 1.0825.', null], ['Multiply 40 × 1.0825. Put 40 on the bottom since it has fewer digits. Multiplying by its 0 gives a row of zeros.', { t: 'vmul', a: 40, b: 1.0825 }], ['Money only needs two decimal places: 43.3000 is $43.30.', null]] },
-          { q: 'A $140 price goes up 35%. What is the new price?', steps: [['Going up 35% means the new price is 100% + 35% = 135%. As a decimal, that is 1.35.', null], ['Multiply 140 × 1.35 the old-school way.', { t: 'vmul', a: 140, b: 1.35 }], ['The new price is $189.', null]] },
-          { q: 'A price goes from $40 to $50. What is the percent increase?', steps: [['Find the change.', '50 - 40 = 10'], ['Write the change over the original price.', '{10/40}'], ['Simplify: divide the top and bottom by 10.', '{10/40} = {1/4}'], ['Make the bottom 100: multiply the top and bottom by 25.', '{1/4} = {25/100}'], ['That is a 25% increase.', '{25/100} = 25%'], ['Check it the old-school way: 25% of 40 should give the change, 10.', { t: 'vmul', a: 40, b: 0.25 }]] },
-          { q: 'After 20% off, a shirt costs $32. What was the original price?', steps: [['You paid 100% − 20% = 80% of the original price, and that was $32.', null], ['Work down to 10%, then up to 100%. The original price was $40.', { t: 'ladder', rows: [[80, 32, 'what you know'], [10, 4, '÷ 8'], [100, 40, '× 10']], money: true }], ['Check it the old-school way: 80% of $40 should be $32.', { t: 'vmul', a: 40, b: 0.8 }]] }],
-        watch: 'For a discount, multiply by what you <b>pay</b>, not by what you save. 25% off is × .75, not × .25. And to undo a discount, don’t add 20% of $32 back on: that gives $38.40, which is wrong.' },
       { t: 'The butterfly method', rule: 'A proportion is two equal fractions. Set them up with the same units on top and the same units on the bottom. Multiply along each wing of the butterfly (the two diagonals), set the two products equal, then divide.',
         ex: [{ q: 'A recipe uses 3 cups of flour for 4 dozen cookies. How much flour for 10 dozen?', steps: [['Cups on top, dozens on the bottom. Multiply along each wing.', { t: 'bf', a: '3', b: '4', c: 'x', d: '10' }], ['Divide both sides by 4. You need 7.5 cups.', { t: 'bal', L: [[4, 'x']], R: [[30, '']], div: 4, dec: true }]] },
           { q: 'The ratio of boys to girls is 3:5. There are 40 students. How many are girls?', steps: [['3 + 5 = 8 equal shares. Find one share.', '40 ÷ 8 = 5'], ['Girls get 5 shares.', '5 * 5 = 25']] }],
         watch: 'Each wing gives one product. Never multiply straight across the tops. And a ratio like 3:5 compares the parts to each other, so add the parts to get the total number of shares.' },
+      { t: 'Percents: multiply, or use the butterfly', tpl: true, rule: 'To find a percent <b>of</b> a number, change the percent to a decimal and multiply the old-school way: line up the right edges, multiply like whole numbers, and count the decimal places. When the percent or the whole is the unknown, set up <b>is over of equals percent over 100</b> and use the butterfly method.',
+        ex: [{ q: 'What is 35% of 140?', steps: [['Change the percent to a decimal: 35% = .35.', null], ['Multiply 140 × .35. Line up the right edges and multiply like whole numbers. The small numbers above 140 are the carries.', { t: 'vmul', a: 140, b: 0.35 }], ['49.00 is the same as 49.', null]] },
+          { q: '18 is what percent of 72?', steps: [['Set up “is over of equals percent over 100.” The part (is) is 18, the whole (of) is 72, and the percent is unknown.', { t: 'bf', a: '18', b: '72', c: 'x', d: '100', lab: true, noProd: true }], ['Make it easier: simplify `{18/72}` by dividing the top and bottom by 18.', '{18/72} = {1/4}'], ['Now use the butterfly method: multiply along each wing.', { t: 'bf', a: '1', b: '4', c: 'x', d: '100' }], ['Divide both sides by 4. The answer is 25%.', { t: 'bal', L: [[4, 'x']], R: [[100, '']], div: 4 }]] },
+          { q: '15 is 30% of what number?', steps: [['Set up “is over of equals percent over 100.” The part (is) is 15, the whole (of) is unknown, and the percent is 30.', { t: 'bf', a: '15', b: 'x', c: '30', d: '100', lab: true, noProd: true }], ['Make it easier: simplify `{30/100}` by dividing the top and bottom by 10.', '{30/100} = {3/10}'], ['Now use the butterfly method: multiply along each wing.', { t: 'bf', a: '15', b: 'x', c: '3', d: '10' }], ['Divide both sides by 3. The number is 50.', { t: 'bal', L: [[3, 'x']], R: [[150, '']], div: 3 }]] }],
+        watch: 'When you multiply, line up the right edges, not the decimal points. In the butterfly setup, the “of” number always goes on the bottom: in “18 is what percent of 72,” the 72 goes under the 18.' },
+      { t: 'Discounts, tax, and markups', rule: 'Turn the story into one multiplication. For 25% off, you still pay 75%, so multiply by .75. For 8.25% tax, you pay 108.25%, so multiply by 1.0825. For a 35% increase, multiply by 1.35. To find a percent change or an original price, use the butterfly setup instead.',
+        ex: [{ q: 'A $60 jacket is 25% off. What is the sale price?', steps: [['25% off means you still pay 100% − 25% = 75%. As a decimal, that is .75.', null], ['Multiply 60 × .75 the old-school way.', { t: 'vmul', a: 60, b: 0.75 }], ['The sale price is $45.', null]] },
+          { q: 'Dallas sales tax is 8.25%. What do you pay for a $40 item?', steps: [['With tax you pay 100% + 8.25% = 108.25%. As a decimal, that is 1.0825.', null], ['Multiply 40 × 1.0825. Put 40 on the bottom since it has fewer digits. Multiplying by its 0 gives a row of zeros.', { t: 'vmul', a: 40, b: 1.0825 }], ['Money only needs two decimal places: 43.3000 is $43.30.', null]] },
+          { q: 'A $140 price goes up 35%. What is the new price?', steps: [['Going up 35% means the new price is 100% + 35% = 135%. As a decimal, that is 1.35.', null], ['Multiply 140 × 1.35 the old-school way.', { t: 'vmul', a: 140, b: 1.35 }], ['The new price is $189.', null]] },
+          { q: 'A price goes from $40 to $50. What is the percent increase?', steps: [['Find the change.', '50 - 40 = 10'], ['Set up “is over of equals percent over 100.” The change (is) is 10, the original price (of) is 40, and the percent is unknown.', { t: 'bf', a: '10', b: '40', c: 'x', d: '100', lab: true, noProd: true }], ['Make it easier: simplify `{10/40}` by dividing the top and bottom by 10.', '{10/40} = {1/4}'], ['Now use the butterfly method: multiply along each wing.', { t: 'bf', a: '1', b: '4', c: 'x', d: '100' }], ['Divide both sides by 4. That is a 25% increase.', { t: 'bal', L: [[4, 'x']], R: [[100, '']], div: 4 }]] },
+          { q: 'After 20% off, a shirt costs $32. What was the original price?', steps: [['You paid 100% − 20% = 80% of the original price, and that was $32.', null], ['Set up “is over of equals percent over 100.” What you paid (is) is 32, the original price (of) is unknown, and the percent is 80.', { t: 'bf', a: '32', b: 'x', c: '80', d: '100', lab: true, noProd: true }], ['Make it easier: simplify `{80/100}` by dividing the top and bottom by 20.', '{80/100} = {4/5}'], ['Now use the butterfly method: multiply along each wing.', { t: 'bf', a: '32', b: 'x', c: '4', d: '5' }], ['Divide both sides by 4. The original price was $40.', { t: 'bal', L: [[4, 'x']], R: [[160, '']], div: 4 }]] }],
+        watch: 'For a discount, multiply by what you <b>pay</b>, not by what you save. 25% off is × .75, not × .25. And to undo a discount, don’t add 20% of $32 back on: that gives $38.40, which is wrong.' },
       { t: 'Rates and mixtures', rule: 'A unit rate is the amount for one. For mixtures, track the actual amount of the ingredient, not just the percent.',
         ex: [{ q: '12 cans cost $5.40. What is the price per can?', steps: [['Divide the price by the number of cans.', '5.40 ÷ 12 = 0.45'], ['That is $0.45 per can.', null]] },
           { q: 'Mix 4 liters of 10% salt water with 6 liters of 20% salt water. What percent salt is the mix?', steps: [['Salt in the first part is 10% of 4 liters: move the decimal point one place left.', '4 ÷ 10 = 0.4'], ['Salt in the second part is 20% of 6 liters. 10% of 6 is 0.6, so 20% is twice that.', '2 * 0.6 = 1.2'], ['Total salt ÷ total liters.', '1.6 ÷ 10 = 0.16 = 16%']] }],
