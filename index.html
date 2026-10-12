@@ -301,6 +301,18 @@ p { margin: 0 0 .75rem; }
 .pc { display: grid; gap: .1rem; padding: .55rem .75rem; border-radius: 10px; background: var(--hi-soft); }
 .pc b { font-family: var(--f-display); font-weight: 900; font-size: 1.3rem; line-height: 1; }
 .pc span { font-size: .85rem; color: var(--ink-soft); line-height: 1.25; }
+
+/* old-school vertical multiplication */
+.work.vmul { display: inline-grid; align-items: end; justify-items: center; row-gap: .08em; font-size: 1.32rem; line-height: 1.15; font-variant-numeric: tabular-nums; padding: .2em .4em .1em 0; }
+.vm-d { position: relative; min-width: .6em; text-align: center; }
+.vm-d.dp::before { content: "."; position: absolute; left: -.2em; bottom: 0; font-weight: 800; color: var(--blue); }
+.vm-sign { justify-self: end; padding-right: .2em; color: var(--ink-soft); }
+.vm-carry { font-size: .58em; line-height: 1; color: var(--violet); font-weight: 700; padding-bottom: .05em; }
+.vm-rule { grid-column: 1 / -1; justify-self: stretch; border-top: 2px solid var(--ink-soft); margin-block: .12em; }
+.vm-row { color: var(--ink-soft); }
+.vm-res { font-weight: 800; }
+.vmwrap { display: grid; justify-items: start; gap: .2rem; }
+.vm-note { margin: 0; font-size: .9rem; color: var(--blue); font-weight: 700; line-height: 1.4; white-space: normal; max-width: 30rem; }
 @media (prefers-reduced-motion: reduce) { *, *::before { transition: none !important; } }
 </style>
 </head>
@@ -512,8 +524,35 @@ function ladderInfo(w) {
   }
   return { rows: w.rows, build, answer: build ? build.ans : w.rows[w.rows.length - 1][1], F };
 }
+/* ---------- old-school vertical multiplication ---------- */
+const pctDec = P => numStr(P / 100);
+function pctToDecSay(P) { const d = pctDec(P), raw = (P % 10 === 0 && P < 100 && P >= 10) ? `${d}0` : null; return `${P}% = ${raw ? `${raw}, or just ${d}` : d}`; }
+const OS = 'Line up the right edges (not the decimal points), multiply like whole numbers, then count decimal places.';
+function numStr(v) { let s = ns(v); if (s.startsWith('0.')) s = s.slice(1); return s; }
+function vparse(s) { const i = s.indexOf('.'), dp = i < 0 ? 0 : s.length - i - 1, digits = s.replace('.', ''); return { s, dp, digits, intStr: digits.replace(/^0+/, '') || '0' }; }
+function vmulInfo(w) {
+  const P = vparse(numStr(w.a)), Q = vparse(numStr(w.b));
+  let top = P, bot = Q; if (P.intStr.length < Q.intStr.length) { top = Q; bot = P; }
+  const t = top.intStr.split('').map(Number).reverse(), bd = bot.intStr.split('').map(Number).reverse(), rows = [];
+  bd.forEach((d, r) => {
+    let carry = 0; const out = [], carries = [];
+    t.forEach((td, j) => { const pr = d * td + carry; out.push(pr % 10); carry = Math.floor(pr / 10); if (carry && j < t.length - 1) carries.push([j + 1, carry]); });
+    if (carry) out.push(carry);
+    rows.push({ digits: out.reverse().join(''), shift: r, carries });
+  });
+  const dp = top.dp + bot.dp; let pd = (BigInt(top.intStr) * BigInt(bot.intStr)).toString();
+  if (dp && pd.length < dp) pd = '0'.repeat(dp - pd.length) + pd;
+  const result = dp ? pd.slice(0, pd.length - dp) + '.' + pd.slice(pd.length - dp) : pd;
+  return { A: P, B: Q, top, bot, rows, sum: pd, dp, result, value: parseFloat(result) };
+}
+const vmul = (a, b) => ({ t: 'vmul', a, b });
+function vmulMaybe(a, b) { // skip the layout for one-digit facts and powers of ten
+  const P = vparse(numStr(a)), Q = vparse(numStr(b)), p10 = x => /^10*$/.test(x.intStr);
+  if ((P.intStr.length === 1 && Q.intStr.length === 1) || p10(P) || p10(Q)) return null;
+  return vmul(a, b);
+}
 function workEqs(w) {
-  if (w.t === 'ladder') return null;
+  if (w.t === 'ladder' || w.t === 'vmul') return null;
   if (w.t === 'bf') { if (w.noProd) return null; const B = bfParts(w); return { from: `{${w.a}/${w.b}} = {${w.c}/${w.d}}`, to: `${B.first} = ${B.second}` }; }
   if (w.t === 'bal') { const B = balParts(w); return { from: `${plainSide(cells(B.L, B.kL, B.o))} = ${plainSide(cells(B.R, B.kR, B.o))}`, to: `${plainSide(cells(B.L2, B.kL, B.o))} = ${plainSide(cells(B.R2, B.kR, B.o))}` }; }
   if (w.t === 'dist') { const D = distParts(w); return { from: `${D.lhsPlain} = ${D.rPlain}`, to: `${plainSide(cells(D.L2, D.kL, D.o))} = ${D.rPlain}` }; }
@@ -538,6 +577,32 @@ function gridRow(lc, rc, eq, cls) {
   return lc.map(t => c(t, cls)).join('') + `<span class="eqs">${eq ? '=' : ''}</span>` + rc.map(t => c(t, cls)).join('');
 }
 function renderWork(w) {
+  if (w.t === 'vmul') {
+    const V = vmulInfo(w), multi = V.rows.length > 1;
+    const width = Math.max(V.top.digits.length, V.bot.digits.length, V.result.replace('.', '').length, ...V.rows.map(r => r.digits.length + r.shift));
+    const cell = (txt, cls, dot) => `<span class="vm-d${cls ? ' ' + cls : ''}${dot ? ' dp' : ''}">${txt}</span>`;
+    const line = (str, shift, cls, sign) => {
+      const chars = []; let dotNext = false;
+      for (const ch of str) { if (ch === '.') { dotNext = true; continue; } chars.push([ch, dotNext]); dotNext = false; }
+      const cells = Array(width).fill(''), dots = Array(width).fill(false);
+      chars.forEach(([ch, dt], i) => { const col = width - 1 - shift - (chars.length - 1 - i); cells[col] = ch; dots[col] = dt; });
+      return `<span class="vm-sign">${sign || ''}</span>` + cells.map((c, i) => cell(c, cls, dots[i])).join('');
+    };
+    let h = `<div class="work vmul" style="grid-template-columns:1.1em repeat(${width}, .74em)">`;
+    V.rows.slice().reverse().forEach(r => {
+      if (!r.carries.length) return;
+      const cells = Array(width).fill(''); r.carries.forEach(([pos, c]) => { cells[width - 1 - pos] = String(c); });
+      h += '<span class="vm-sign"></span>' + cells.map(c => cell(c, 'vm-carry')).join('');
+    });
+    h += line(V.top.s, 0, '') + line(V.bot.s, 0, '', '×') + '<span class="vm-rule"></span>';
+    if (multi) { V.rows.forEach((r, i) => { h += line(r.digits, r.shift, 'vm-row', i === V.rows.length - 1 ? '+' : ''); }); h += '<span class="vm-rule"></span>'; }
+    h += line(V.result, 0, 'vm-res') + '</div>';
+    if (V.dp) {
+      const [n1, n2] = V.A.dp >= V.B.dp ? [V.A, V.B] : [V.B, V.A];
+      h += `<p class="vm-note">${n1.s} has ${plural(n1.dp, 'decimal place')} and ${n2.s} has ${n2.dp}, so count ${V.dp} place${V.dp === 1 ? '' : 's'} from the right and put the decimal point there.</p>`;
+    }
+    return `<div class="vmwrap">${h}</div>`;
+  }
   if (w.t === 'ladder') {
     const L = ladderInfo(w);
     let h = '<div class="work ladder m">';
@@ -1002,12 +1067,16 @@ function s3a() {
   const r0 = Math.random();
   if (r0 < 0.4) {
     let P, W, a, tries = 0; do { P = pick([10, 20, 25, 30, 40, 50, 60, 75, 15, 35, 45, 5, 80]); W = pick([20, 40, 60, 80, 120, 140, 160, 200, 240, 300, 360, 480]); a = P * W / 100; tries++; } while (!isInt(a) && tries < 50);
-    const cands = [{ m: ns(a * 10), why: `Decimal slip. 10% of ${W} is ${ns(W / 10)}: move the decimal point one place left, not zero places.` }, { m: ns(a / 10), why: `Decimal slip. 10% of ${W} is ${ns(W / 10)}: move the decimal point one place left, not two.` },
-      W - P > 0 ? { m: ns(W - P), why: `Subtracting doesn't find a percent. Start with 10% of ${W}, which is ${ns(W / 10)}, and build ${P}% from that.` } : null,
+    const D = pctDec(P), V = vmulInfo({ a: W, b: P / 100 });
+    const cands = [{ m: ns(a * 10), why: `Decimal slip. ${D} has ${plural(V.B.dp, 'decimal place')}, so count ${V.dp} place${V.dp === 1 ? '' : 's'} from the right in your answer.` }, { m: ns(a / 10), why: `Decimal slip. Count the decimal places in both numbers: the answer gets ${V.dp}, not ${V.dp + 1}.` },
+      W - P > 0 ? { m: ns(W - P), why: `Subtracting doesn't find a percent. Change ${P}% to ${D} and multiply: ${W} × ${D}.` } : null,
       { m: ns(W + a), why: `That's ${W} increased by ${P}%. The question only asks for ${P}% of ${W}.` }];
-    return { q: `What is ${P}% of ${W}?`, big: [], choices: mc({ m: ns(a) }, cands, numFb(a, v => ({ m: ns(v), why: `Recheck: 10% of ${W} is ${ns(W / 10)}. Build ${P}% from that.` }))),
-      hint: 'Use the 10% method: move the decimal point one place left to get 10%. Then build the percent you need from that piece.',
-      steps: [[[5, 10, 25, 50].includes(P) ? 'Use the 10% method: find the easy pieces.' : `Use the 10% method: find the easy pieces, then build ${P}% from them.`, pctLadder(P, W)]], spec: { type: 'num', fn: 'pctOf', p: { P, W } } };
+    return { q: `What is ${P}% of ${W}?`, big: [], choices: mc({ m: ns(a) }, cands, numFb(a, v => ({ m: ns(v), why: `Recheck: change ${P}% to ${D} and multiply ${W} × ${D}.` }))),
+      hint: `Change ${P}% to a decimal by moving the decimal point two places left. “Of” means multiply.`,
+      steps: [[`Change the percent to a decimal: move the decimal point two places left. ${pctToDecSay(P)}.`, null],
+        [`Multiply ${W} × ${D} the old-school way. ${OS}`, vmul(W, P / 100)],
+        V.result !== ns(a) ? [`${V.result} is the same as ${ns(a)}.`, null] : null].filter(Boolean),
+      spec: { type: 'num', fn: 'pctOf', p: { P, W } } };
   }
   if (r0 < 0.7) {
     let P, W, part; do { W = pick([20, 24, 25, 40, 48, 50, 60, 64, 72, 80, 120, 200]); P = pick([5, 10, 20, 25, 40, 50, 60, 75, 80, 15]); part = W * P / 100; } while (!isInt(part));
@@ -1017,7 +1086,7 @@ function s3a() {
       { t: pct(part / W), why: `${ns(part / W)} is the decimal. Make the bottom 100 instead: the top number is the percent.` }];
     return { q: `${part} is what percent of ${W}?`, big: [], choices: mc({ t: pct(P) }, cands, numFb(P, v => v > 0 ? { t: pct(v), why: `Check: ${ns(v)}% of ${W} is ${ns(v * W / 100)}, not ${part}.` } : null)),
       hint: 'Write the part over the whole. Simplify, then make the bottom 100. The top number is the percent.',
-      steps: hundredSteps(part, W, P, 'Write the part over the whole.'), spec: { type: 'num', fn: 'whatPct', p: { part, W } } };
+      steps: hundredSteps(part, W, P, 'Write the part over the whole.').concat([[`Check it the old-school way: ${P}% of ${W} should give ${part}. Multiply ${W} × ${pctDec(P)}.`, vmul(W, P / 100)]]), spec: { type: 'num', fn: 'whatPct', p: { part, W } } };
   }
   let P, W, part; do { P = pick([10, 20, 25, 40, 50, 75, 30, 60, 15]); W = pick([20, 40, 60, 80, 100, 120, 160, 200, 240]); part = P * W / 100; } while (!isInt(part));
   const cands = [decs(part * P / 100, 2) ? { m: ns(part * P / 100), why: `You found ${P}% of ${part}. But ${part} is already ${P}% of the number, so work up to 100%.` } : null,
@@ -1025,7 +1094,8 @@ function s3a() {
     { m: ns(part + P), why: `Adding the percent doesn't work. Work from ${P}% down to a friendly percent, then up to 100%.` }];
   return { q: `${part} is ${P}% of what number?`, big: [], choices: mc({ m: ns(W) }, cands, numFb(W, v => v > 0 ? { m: ns(v), why: `Check: ${P}% of ${ns(v)} is ${ns(P * v / 100)}, not ${part}.` } : null)),
     hint: `${part} is ${P}% of the number. Divide to get a friendly percent like 10%, then multiply up to 100%.`,
-    steps: [[`You know ${P}% of the number is ${part}. Work down to a friendly percent, then up to 100%.`, wholeLadder(P, part)]],
+    steps: [[`You know ${P}% of the number is ${part}. Work down to a friendly percent, then up to 100%.`, wholeLadder(P, part)],
+      [`Check it the old-school way: ${P}% of ${W} should give ${part}. Multiply ${W} × ${pctDec(P)}.`, vmul(W, P / 100)]],
     spec: { type: 'num', fn: 'whole', p: { part, P } } };
 }
 
@@ -1035,22 +1105,28 @@ function s3b() {
     const item = pick(['jacket', 'pair of shoes', 'backpack', 'video game', 'hoodie', 'pair of headphones']);
     const Pr = pick([20, 24, 30, 36, 40, 45, 48, 50, 60, 64, 72, 80, 90, 120]), d = pick([10, 15, 20, 25, 30, 40, 50]), sale = Pr * (100 - d) / 100, disc = Pr * d / 100;
     const fm = moneyAll([sale, disc, Pr - d, Pr * (100 + d) / 100]);
-    const cands = [{ t: fm(disc), why: `That's how much you save. Subtract it from ${money(Pr)} to get what you pay.` },
-      Pr - d > 0 ? { t: fm(Pr - d), why: `${d}% off is not ${money(d)} off. Find ${d}% of ${money(Pr)} first with the 10% method.` } : null,
-      { t: fm(Pr * (100 + d) / 100), why: 'A discount lowers the price. You added.' }];
-    return { q: `A ${item} costs ${money(Pr)}. It is on sale for ${d}% off. What is the sale price?`, big: [], choices: mc({ t: fm(sale) }, cands, numFb(sale, v => ({ t: fm(v), why: `Recheck: find ${d}% of ${money(Pr)}, then subtract it.` }))),
-      hint: `Find ${d}% of ${money(Pr)} with the 10% method, then subtract it from the price.`,
-      steps: [[`Find the discount, ${d}% of ${money(Pr)}, with the 10% method.`, pctLadder(d, Pr, true)], [`Subtract the ${money(disc)} discount from the price.`, `${Pr} - ${cash(disc)} = ${cash(sale)}`]],
+    const pay = 100 - d, D = pctDec(pay), V = vmulInfo({ a: Pr, b: pay / 100 });
+    const cands = [{ t: fm(disc), why: `That's how much you save, not what you pay. ${d}% off means you pay ${pay}%, so multiply ${Pr} × ${D}.` },
+      Pr - d > 0 ? { t: fm(Pr - d), why: `${d}% off is not ${money(d)} off. You pay ${pay}% of the price, so multiply ${Pr} × ${D}.` } : null,
+      { t: fm(Pr * (100 + d) / 100), why: `A discount lowers the price. You multiplied by ${numStr(1 + d / 100)} instead of ${D}.` }];
+    return { q: `A ${item} costs ${money(Pr)}. It is on sale for ${d}% off. What is the sale price?`, big: [], choices: mc({ t: fm(sale) }, cands, numFb(sale, v => ({ t: fm(v), why: `Recheck: you pay ${pay}%, so multiply ${Pr} × ${D}.` }))),
+      hint: `If you get ${d}% off, you still pay ${pay}%. Multiply the price by ${D}.`,
+      steps: [[`${d}% off means you still pay 100% − ${d}% = ${pay}%. ${pctToDecSay(pay)}.`, null],
+        [`Multiply ${Pr} × ${D} the old-school way. ${OS}`, vmul(Pr, pay / 100)],
+        [`The sale price is ${fm(sale)}.`, null]],
       spec: { type: 'num', fn: 'sale', p: { P: Pr, d }, money: true } };
   }
   if (r0 < 0.5) {
     const Pr = pick([20, 40, 60, 80, 100, 120, 160, 200]), tax = Pr * 0.0825, tot = Pr + tax, item = pick(['a pair of sneakers', 'a calculator', 'a phone case', 'a jersey', 'a lamp']);
     const fm = v => '$' + r2(v).toFixed(2);
-    const cands = [{ t: fm(tax), why: `That's just the tax. Add it to the ${money(Pr)} price.` }, { t: fm(Pr + 8.25), why: `8.25% of ${money(Pr)} is not ${money(8.25)}. Start with 1% of ${money(Pr)}, which is $${(Pr / 100).toFixed(2)}.` },
-      { t: fm(Pr * 1.825), why: 'Decimal slip. 1% means moving the decimal point two places left, so the tax is ten times smaller than this.' }];
-    return { q: `Dallas sales tax is 8.25%. What is the total cost of ${item} priced at ${money(Pr)}, including tax?`, big: [], choices: mc({ t: fm(tot) }, cands, numFb(tot, v => ({ t: fm(v), why: 'Recheck: find the tax, then add it to the price.' }))),
-      hint: 'Find 1% of the price by moving the decimal point two places left. 8.25% is 8 of those, plus a quarter of one more.',
-      steps: [[`Find the tax, 8.25% of ${money(Pr)}. Start with 1%, then build 8.25%.`, pctLadder(8.25, Pr, true)], ['Add the tax to the price.', `${Pr} + ${r2(tax).toFixed(2)} = ${r2(tot).toFixed(2)}`]],
+    const V = vmulInfo({ a: Pr, b: 1.0825 });
+    const cands = [{ t: fm(tax), why: `That's just the tax. Multiply by 1.0825 (100% + 8.25%) to get the price and the tax together.` }, { t: fm(Pr + 8.25), why: `8.25% of ${money(Pr)} is not ${money(8.25)}. Multiply ${Pr} × 1.0825.` },
+      { t: fm(Pr * 1.825), why: '8.25% as a decimal is .0825, so 100% + 8.25% is 1.0825, not 1.825.' }];
+    return { q: `Dallas sales tax is 8.25%. What is the total cost of ${item} priced at ${money(Pr)}, including tax?`, big: [], choices: mc({ t: fm(tot) }, cands, numFb(tot, v => ({ t: fm(v), why: `Recheck: multiply ${Pr} × 1.0825.` }))),
+      hint: 'With tax you pay 100% + 8.25% = 108.25% of the price. Multiply the price by 1.0825.',
+      steps: [['With tax you pay the price plus 8.25%: 100% + 8.25% = 108.25%. As a decimal, that is 1.0825.', null],
+        [`Multiply ${Pr} × 1.0825 the old-school way. Put the number with fewer digits on the bottom. ${OS}`, vmul(Pr, 1.0825)],
+        [`Money only needs two decimal places: ${V.result} is ${fm(tot)}.`, null]],
       spec: { type: 'num', fn: 'tax', p: { P: Pr }, money: true } };
   }
   if (r0 < 0.75) {
@@ -1061,7 +1137,7 @@ function s3b() {
       { t: pct(nw / o * 100), why: `Use the <b>change</b> on top, not the new price: ${fr}.` }];
     return { q: `${thing} went from ${money(o)} to ${money(nw)}. What is the percent ${word}?`, big: [], choices: mc({ t: pct(p) }, cands, numFb(p, v => v > 0 ? { t: pct(v), why: `Recheck: write ${fr}, simplify, and make the bottom 100.` } : null)),
       hint: 'Write the change over the original price. Simplify, then make the bottom 100.',
-      steps: [[`Find the change: ${up ? 'new price minus original price' : 'original price minus new price'}.`, `${Math.max(nw, o)} - ${Math.min(nw, o)} = ${ch}`]].concat(hundredSteps(ch, o, p, 'Write the change over the original price.')).concat([[`That's a ${p}% ${word}.`, null]]),
+      steps: [[`Find the change: ${up ? 'new price minus original price' : 'original price minus new price'}.`, `${Math.max(nw, o)} - ${Math.min(nw, o)} = ${ch}`]].concat(hundredSteps(ch, o, p, 'Write the change over the original price.')).concat([[`That's a ${p}% ${word}.`, null], [`Check it the old-school way: ${p}% of ${o} should give the change, ${ch}. Multiply ${o} × ${pctDec(p)}.`, vmul(o, p / 100)]]),
       spec: { type: 'num', fn: 'change', p: { o, n: nw } } };
   }
   let O, d, F; do { O = pick([20, 25, 30, 40, 50, 60, 75, 80, 100, 120]); d = pick([10, 20, 25, 40, 50]); F = O * (100 - d) / 100; } while (!decs(F, 2));
@@ -1072,7 +1148,7 @@ function s3b() {
     hint: `You paid ${pay}% of the original price. Divide to get a friendly percent like 10%, then multiply up to 100%.`,
     steps: [[`After ${d}% off, you paid 100% − ${d}% = ${pay}% of the original price, and that was ${money(F)}.`, null],
       ['Work down to a friendly percent, then up to 100%.', wholeLadder(pay, F, true)],
-      [`Check: ${d}% of ${money(O)} is ${money(O * d / 100)}, and ${money(O)} − ${money(O * d / 100)} = ${money(F)} ✓`, null]],
+      [`Check it the old-school way: ${pay}% of ${money(O)} should be ${money(F)}. Multiply ${O} × ${pctDec(pay)}.`, vmul(O, pay / 100)]],
     spec: { type: 'num', fn: 'orig', p: { F, d }, money: true } };
 }
 
@@ -1096,7 +1172,7 @@ function s3c() {
     return { q: S.mk(a, b, c), big: [], choices: mc(W(ans), cands, numFb(ans, v => v > 0 ? Object.assign(W(v), { why: `Check the ratio: ${a} for ${b * k} should equal ${ns(v)} for ${c * k}.` }) : null)),
       hint: `Set up two matching fractions with ${S.top} on top and ${S.bot} on the bottom.`,
       steps: [[`Set up matching fractions with ${S.top} on top and ${S.bot} on the bottom. Then use the butterfly method.`, { t: 'bf', a: ns(a), b: ns(b * k), c: 'x', d: ns(c * k) }],
-        mulParts(a, c * k), [`Divide both sides by ${b * k}.`, { t: 'bal', L: [[b * k, 'x']], R: [[a * c * k, '']], div: b * k, dec: true }]].filter(Boolean),
+        vmulMaybe(a, c * k) ? [`Multiply ${a} × ${c * k} the old-school way.`, vmulMaybe(a, c * k)] : null, [`Divide both sides by ${b * k}.`, { t: 'bal', L: [[b * k, 'x']], R: [[a * c * k, '']], div: b * k, dec: true }]].filter(Boolean),
       spec: { type: 'num', fn: 'scale', p: { a, b: b * k, c: c * k } } };
   }
   if (r0 < 0.65) {
@@ -1118,7 +1194,7 @@ function s3c() {
       const W = v => ({ t: plural(v, 'mile') });
       const cands = [Object.assign(W(s + inches), { why: 'Each inch stands for ' + s + ' miles, so multiply.' }), decs(s / inches, 1) ? Object.assign(W(s / inches), { why: 'Multiply the inches by ' + s + ', don\'t divide.' }) : null, Object.assign(W(miles * 2), { why: `Recheck: ${ns(inches)} × ${s}.` })];
       return { q: `On a map, 1 inch represents ${s} miles. Two towns are ${plural(inches, 'inch', 'inches')} apart on the map. How far apart are they in real life?`, big: [], choices: mc(W(miles), cands, numFb(miles, v => v > 0 ? Object.assign(W(v), { why: `Check: ${ns(inches)} inches × ${s} miles per inch = ${ns(miles)} miles.` }) : null)),
-        hint: 'Every inch on the map is ' + s + ' miles.', steps: [['Set up matching fractions with inches on top and miles on the bottom. Then use the butterfly method.', { t: 'bf', a: '1', b: ns(s), c: ns(inches), d: 'x' }], mulParts(s, inches), [`The towns are ${ns(miles)} miles apart.`, `x = ${ns(miles)}`]].filter(Boolean), spec: { type: 'num', fn: 'map', p: { s, i: inches } } };
+        hint: 'Every inch on the map is ' + s + ' miles.', steps: [['Set up matching fractions with inches on top and miles on the bottom. Then use the butterfly method.', { t: 'bf', a: '1', b: ns(s), c: ns(inches), d: 'x' }], vmulMaybe(s, inches) ? [`Multiply ${s} × ${ns(inches)} the old-school way. ${OS}`, vmulMaybe(s, inches)] : null, [`The towns are ${ns(miles)} miles apart.`, `x = ${ns(miles)}`]].filter(Boolean), spec: { type: 'num', fn: 'map', p: { s, i: inches } } };
     }
     const W = v => ({ t: plural(v, 'inch', 'inches') });
     const cands = [Object.assign(W(miles * s), { why: `Divide the miles by ${s}, don't multiply.` }), decs(s / miles, 2) ? Object.assign(W(s / miles), { why: `Upside down. Divide ${ns(miles)} by ${s}.` }) : null, Object.assign(W(miles - s), { why: `Divide by ${s}, don't subtract.` })];
@@ -1129,17 +1205,13 @@ function s3c() {
   const cands = [decs(a * c / b, 1) ? { m: ns(a * c / b), why: `Use the butterfly method: x pairs with ${c} and ${a} pairs with ${b}, so \`${c}x = ${a} * ${b}\`. Then divide by ${c}.` } : null, a + b - c > 0 ? { m: ns(a + b - c), why: 'Proportions use multiplying, not adding and subtracting.' } : null, isInt(b * c / a) ? { m: ns(b * c / a), why: `Follow the butterfly wings: x with ${c}, and ${a} with ${b}.` } : null];
   return { q: 'Solve the proportion for `x`.', big: [`{x/${a}} = {${b}/${c}}`], choices: mc({ m: ns(x) }, cands, numFb(x, v => v > 0 ? { m: ns(v), why: 'Use the butterfly method, then divide.' } : null)),
     hint: 'Use the butterfly method: multiply along each wing (the diagonals) and set the two products equal.',
-    steps: [['Use the butterfly method: multiply along each wing.', { t: 'bf', a: 'x', b: ns(a), c: ns(b), d: ns(c) }], mulParts(a, b), [`Divide both sides by ${c}.`, { t: 'bal', L: [[c, 'x']], R: [[a * b, '']], div: c }]].filter(Boolean), spec: { type: 'solve', eq: `{x/${a}} = {${b}/${c}}`, v: 'x' } };
+    steps: [['Use the butterfly method: multiply along each wing.', { t: 'bf', a: 'x', b: ns(a), c: ns(b), d: ns(c) }], vmulMaybe(a, b) ? [`Multiply ${a} × ${b} the old-school way.`, vmulMaybe(a, b)] : null, [`Divide both sides by ${c}.`, { t: 'bal', L: [[c, 'x']], R: [[a * b, '']], div: c }]].filter(Boolean), spec: { type: 'solve', eq: `{x/${a}} = {${b}/${c}}`, v: 'x' } };
 }
 
 function mixPiece(sub, p, V, which) {
-  const ten = r4(V / 10), tens = Math.floor(p / 10), five = p % 10 === 5, total = r4(V * p / 100);
-  const say = `${cap(sub)} in the ${which} part is ${p}% of ${V} liters. 10% of ${V} is ${ns(ten)}${five ? `, and 5% is half of that, ${ns(r4(ten / 2))}` : ''}.`;
-  let m;
-  if (p === 10) m = `${V} ÷ 10 = ${ns(ten)}`;
-  else if (p === 5) m = `${ns(ten)} ÷ 2 = ${ns(total)}`;
-  else m = `${tens === 1 ? ns(ten) : `${tens} * ${ns(ten)}`}${five ? ` + ${ns(r4(ten / 2))}` : ''} = ${ns(total)}`;
-  return [say, m];
+  const total = r4(V * p / 100), w = vmulMaybe(V, p / 100);
+  const say = `${cap(sub)} in the ${which} part is ${p}% of ${V} liters. ${pctToDecSay(p)}, so multiply ${V} × ${pctDec(p)}.`;
+  return [say, w || `${V} * ${pctDec(p)} = ${numStr(total)}`];
 }
 function s3d() {
   const r0 = Math.random();
@@ -1149,14 +1221,14 @@ function s3d() {
     const fm = v => '$' + r2(v).toFixed(2);
     const cands = [{ t: fm(per * 10), why: 'Decimal slip. Divide carefully: price ÷ number of items.' }, { t: fm(n / P), why: `That's ${it[0]} per dollar. Price per ${it[1]} is the price divided by the count.` }, P - n > 0 ? { t: fm(P - n), why: 'Divide the price by the count, don\'t subtract.' } : null];
     return { q: `A pack of ${n} ${it[0]} costs ${money(P)}. What is the price per ${it[1]}?`, big: [], choices: mc({ t: fm(per) }, cands, numFb(per, v => v > 0 ? { t: fm(v), why: `Check: ${n} × ${fm(v)} = ${fm(n * v)}.` } : null)),
-      hint: 'Unit price = total price ÷ number of items.', steps: [['Divide the price by the number of items.', `${P.toFixed(2)} ÷ ${n} = ${per.toFixed(2)}`]], spec: { type: 'num', fn: 'unit', p: { P, n }, money: true } };
+      hint: 'Unit price = total price ÷ number of items.', steps: [['Divide the price by the number of items.', `${P.toFixed(2)} ÷ ${n} = ${per.toFixed(2)}`], [`Check it the old-school way: ${n} items at ${fm(per)} each should cost ${money(P)}.`, vmul(n, per)]], spec: { type: 'num', fn: 'unit', p: { P, n }, money: true } };
   }
   if (r0 < 0.55) {
     let a, b, c, ans; do { a = pick([6, 8, 10, 12, 15, 18, 20, 24]); b = rint(2, 6); c = a * rint(2, 8) * pick([1, 0.5]); ans = b * c / a; } while (!isInt(c) || !decs(ans, 1) || c === a);
     const W = v => ({ t: plural(v, 'minute') });
     const cands = [Object.assign(W(c / a), { why: `${ns(c / a)} is how many batches of ${a} pages. Each batch takes ${b} minutes, so multiply.` }), decs(a * c / b, 1) ? Object.assign(W(a * c / b), { why: `Upside down. Keep minutes on top: \`{${b}/${a}} = {x/${c}}\`.` }) : null, c - a + b > 0 ? Object.assign(W(c - a + b), { why: 'Rates scale by multiplying, not by adding.' }) : null];
     return { q: `A printer prints ${a} pages in ${b} minutes. At that rate, how many minutes will it take to print ${c} pages?`, big: [], choices: mc(W(ans), cands, numFb(ans, v => v > 0 ? Object.assign(W(v), { why: `Check: at ${a} pages every ${b} minutes, ${ns(v)} minutes prints ${ns(v * a / b)} pages, not ${c}.` }) : null)),
-      hint: 'Set up minutes over pages on both sides, or find how many minutes one page takes.', steps: [['Set up matching fractions with minutes on top and pages on the bottom. Then use the butterfly method.', { t: 'bf', a: ns(b), b: ns(a), c: 'x', d: ns(c) }], mulParts(b, c), [`Divide both sides by ${a}.`, { t: 'bal', L: [[a, 'x']], R: [[b * c, '']], div: a, dec: true }]].filter(Boolean),
+      hint: 'Set up minutes over pages on both sides, or find how many minutes one page takes.', steps: [['Set up matching fractions with minutes on top and pages on the bottom. Then use the butterfly method.', { t: 'bf', a: ns(b), b: ns(a), c: 'x', d: ns(c) }], vmulMaybe(b, c) ? [`Multiply ${b} × ${c} the old-school way.`, vmulMaybe(b, c)] : null, [`Divide both sides by ${a}.`, { t: 'bal', L: [[a, 'x']], R: [[b * c, '']], div: a, dec: true }]].filter(Boolean),
       spec: { type: 'num', fn: 'scale', p: { a: b, b: a, c } } };
   }
   if (r0 < 0.8) {
@@ -1392,7 +1464,7 @@ function mathInner(s) {
 const renderMath = s => `<span class="m">${mathInner(String(s))}</span>`;
 function renderProse(s) { return String(s).split('`').map((seg, i) => i % 2 ? renderMath(seg) : seg).join(''); }
 
-const api = { SKILLS, generate, renderMath, renderProse, renderWork, workEqs, ladderInfo, pctLadder, wholeLadder, hundredSteps, Fr, lin };
+const api = { SKILLS, generate, renderMath, renderProse, renderWork, workEqs, vmulInfo, vmul, numStr, ladderInfo, pctLadder, wholeLadder, hundredSteps, Fr, lin };
 if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.TSI = api;
 })(typeof window !== 'undefined' ? window : globalThis);
 
@@ -1452,17 +1524,18 @@ const MODS = [
   { n: 3, title: 'Percents & Proportions', short: 'Percents', mins: 35, at: '1:40–2:15', skills: ['s3a', 's3b', 's3c', 's3d'],
     why: 'Percent and ratio questions are guaranteed to show up under quantitative reasoning, and they are some of the easiest points to lock in.',
     moves: [
-      { t: 'The 10% method', pieces: true, rule: 'You never have to multiply by a percent. Move the decimal point one place left to get 10%. Half of that is 5%. Move it two places left to get 1%. Then build the percent you need out of those pieces, using small numbers only.',
-        ex: [{ q: 'What is 35% of 80?', steps: [['Find the easy pieces, then build 35% from them: 35% is three 10%s and one 5%.', { t: 'ladder', rows: [[100, 80, 'the whole'], [10, 8, 'move the decimal point one place left'], [5, 4, 'half of 10%']], build: { target: 35, terms: [[3, 10], [1, 5]] } }]] },
-          { q: '18 is what percent of 72?', steps: [['Write the part over the whole.', '{18/72}'], ['Simplify: divide the top and bottom by 18.', '{18/72} = {1/4}'], ['Make the bottom 100: multiply the top and bottom by 25.', '{1/4} = {25/100}'], ['“Out of 100” is a percent. The answer is 25%.', '{25/100} = 25%']] },
-          { q: '15 is 30% of what number?', steps: [['You know 30% of the number is 15. Work down to 10%, then up to 100%.', { t: 'ladder', rows: [[30, 15, 'what you know'], [10, 5, '÷ 3'], [100, 50, '× 10']] }]] }],
-        watch: 'One place left is 10%, two places left is 1%. A percent less than 100% of a number has to come out smaller than that number, so check the size of your answer.' },
-      { t: 'Discounts, tax, and percent change', rule: 'Find the dollar amount of the discount or the tax with the same pieces, then finish the story: subtract a discount, add tax. For percent change, put the change over the original price and make the bottom 100.',
-        ex: [{ q: 'A $60 jacket is 25% off. What is the sale price?', steps: [['Find the discount, 25% of $60: half of 60, then half again.', { t: 'ladder', rows: [[100, 60, 'the whole'], [50, 30, 'half of 100%'], [25, 15, 'half of 50%']], money: true }], ['Subtract the $15 discount from the price. The sale price is $45.', '60 - 15 = 45']] },
-          { q: 'Dallas sales tax is 8.25%. What do you pay for a $40 item?', steps: [['Find the tax, 8.25% of $40. Start with 1%, then build 8.25%.', { t: 'ladder', rows: [[100, 40, 'the whole'], [1, 0.4, 'move the decimal point <b>two</b> places left'], [0.25, 0.1, 'a quarter of 1% (divide by 4)']], build: { target: 8.25, terms: [[8, 1], [1, 0.25]] }, money: true }], ['Add the tax to the price. You pay $43.30.', '40 + 3.30 = 43.30']] },
-          { q: 'A price goes from $40 to $50. What is the percent increase?', steps: [['Find the change.', '50 - 40 = 10'], ['Write the change over the original price.', '{10/40}'], ['Simplify: divide the top and bottom by 10.', '{10/40} = {1/4}'], ['Make the bottom 100: multiply the top and bottom by 25.', '{1/4} = {25/100}'], ['That is a 25% increase.', '{25/100} = 25%']] },
-          { q: 'After 20% off, a shirt costs $32. What was the original price?', steps: [['You paid 100% − 20% = 80% of the original price, and that was $32.', null], ['Work down to 10%, then up to 100%. The original price was $40.', { t: 'ladder', rows: [[80, 32, 'what you know'], [10, 4, '÷ 8'], [100, 40, '× 10']], money: true }]] }],
-        watch: 'To undo a discount, don’t add 20% of $32 back on. That gives $38.40, which is wrong, because the 20% was taken from the original price.' },
+      { t: 'Percent of a number: multiply the old-school way', rule: 'Change the percent to a decimal by moving the decimal point two places left: 35% = .35. Then multiply the way you learned in elementary school. Line up the <b>right edges</b>, not the decimal points. Multiply like whole numbers, add the rows, and count the decimal places.',
+        ex: [{ q: 'What is 35% of 140?', steps: [['Change the percent to a decimal: 35% = .35.', null], ['Multiply 140 × .35. Line up the right edges and multiply like whole numbers. The small numbers above 140 are the carries.', { t: 'vmul', a: 140, b: 0.35 }], ['49.00 is the same as 49.', null]] },
+          { q: '18 is what percent of 72?', steps: [['Write the part over the whole.', '{18/72}'], ['Simplify: divide the top and bottom by 18.', '{18/72} = {1/4}'], ['Make the bottom 100: multiply the top and bottom by 25.', '{1/4} = {25/100}'], ['“Out of 100” is a percent. The answer is 25%.', '{25/100} = 25%'], ['Check it the old-school way: 25% of 72 should give 18.', { t: 'vmul', a: 72, b: 0.25 }]] },
+          { q: '15 is 30% of what number?', steps: [['You know 30% of the number is 15. Work down to 10%, then up to 100%.', { t: 'ladder', rows: [[30, 15, 'what you know'], [10, 5, '÷ 3'], [100, 50, '× 10']] }], ['Check it the old-school way: 30% of 50 should give 15.', { t: 'vmul', a: 50, b: 0.3 }]] }],
+        watch: 'Line up the right edges when you multiply. Lining up the decimal points is only for adding and subtracting. Then count the decimal places in <b>both</b> numbers: .35 has two, so the answer gets two.' },
+      { t: 'Discounts, tax, and markups: one multiplication', rule: 'Turn the whole story into one multiplication. For 25% off, you still pay 75%, so multiply by .75. For 8.25% tax, you pay 108.25%, so multiply by 1.0825. For a 35% increase, multiply by 1.35. Put the number with fewer digits on the bottom.',
+        ex: [{ q: 'A $60 jacket is 25% off. What is the sale price?', steps: [['25% off means you still pay 100% − 25% = 75%. As a decimal, that is .75.', null], ['Multiply 60 × .75 the old-school way.', { t: 'vmul', a: 60, b: 0.75 }], ['The sale price is $45.', null]] },
+          { q: 'Dallas sales tax is 8.25%. What do you pay for a $40 item?', steps: [['With tax you pay 100% + 8.25% = 108.25%. As a decimal, that is 1.0825.', null], ['Multiply 40 × 1.0825. Put 40 on the bottom since it has fewer digits. Multiplying by its 0 gives a row of zeros.', { t: 'vmul', a: 40, b: 1.0825 }], ['Money only needs two decimal places: 43.3000 is $43.30.', null]] },
+          { q: 'A $140 price goes up 35%. What is the new price?', steps: [['Going up 35% means the new price is 100% + 35% = 135%. As a decimal, that is 1.35.', null], ['Multiply 140 × 1.35 the old-school way.', { t: 'vmul', a: 140, b: 1.35 }], ['The new price is $189.', null]] },
+          { q: 'A price goes from $40 to $50. What is the percent increase?', steps: [['Find the change.', '50 - 40 = 10'], ['Write the change over the original price.', '{10/40}'], ['Simplify: divide the top and bottom by 10.', '{10/40} = {1/4}'], ['Make the bottom 100: multiply the top and bottom by 25.', '{1/4} = {25/100}'], ['That is a 25% increase.', '{25/100} = 25%'], ['Check it the old-school way: 25% of 40 should give the change, 10.', { t: 'vmul', a: 40, b: 0.25 }]] },
+          { q: 'After 20% off, a shirt costs $32. What was the original price?', steps: [['You paid 100% − 20% = 80% of the original price, and that was $32.', null], ['Work down to 10%, then up to 100%. The original price was $40.', { t: 'ladder', rows: [[80, 32, 'what you know'], [10, 4, '÷ 8'], [100, 40, '× 10']], money: true }], ['Check it the old-school way: 80% of $40 should be $32.', { t: 'vmul', a: 40, b: 0.8 }]] }],
+        watch: 'For a discount, multiply by what you <b>pay</b>, not by what you save. 25% off is × .75, not × .25. And to undo a discount, don’t add 20% of $32 back on: that gives $38.40, which is wrong.' },
       { t: 'The butterfly method', rule: 'A proportion is two equal fractions. Set them up with the same units on top and the same units on the bottom. Multiply along each wing of the butterfly (the two diagonals), set the two products equal, then divide.',
         ex: [{ q: 'A recipe uses 3 cups of flour for 4 dozen cookies. How much flour for 10 dozen?', steps: [['Cups on top, dozens on the bottom. Multiply along each wing.', { t: 'bf', a: '3', b: '4', c: 'x', d: '10' }], ['Divide both sides by 4. You need 7.5 cups.', { t: 'bal', L: [[4, 'x']], R: [[30, '']], div: 4, dec: true }]] },
           { q: 'The ratio of boys to girls is 3:5. There are 40 students. How many are girls?', steps: [['3 + 5 = 8 equal shares. Find one share.', '40 ÷ 8 = 5'], ['Girls get 5 shares.', '5 * 5 = 25']] }],
@@ -1572,12 +1645,12 @@ function home() {
   <section class="block">
     <h2>How the math test works</h2>
     <ul class="facts">
-      <li><b>20</b><span>questions on the math section</span></li>
+      <li><b>20 questions</b><span>to start. Score under 950 and you take a 48-question diagnostic test next.</span></li>
       <li><b>One at a time</b><span>You can’t skip a question or go back to change an answer.</span></li>
       <li><b>No handheld calculator</b><span>Some questions have a calculator built into the screen.</span></li>
       <li><b>No time limit</b><span>Slow down and check your work.</span></li>
     </ul>
-    <p class="fine">College ready in math means a score of <b>950 or higher</b> on a scale that runs from 910 to 990.</p>
+    <p class="fine">College ready in math means a score of <b>950 or higher</b> on the first 20 questions (the scale runs from 910 to 990). If you score lower, a Diagnostic Level 6 on the 48 questions also counts as college ready, so the diagnostic is a second chance.</p>
   </section>
   <section class="block">
     <h2>Today’s plan</h2>
